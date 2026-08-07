@@ -1060,15 +1060,19 @@ body.menu-open .menu__link {
   max-height: 100%;
   display: grid; place-items: center;
 }
+/* The image is ALWAYS visible. It used to start at opacity 0 and wait for
+   an `is-ready` class added on load — if that reveal failed for any reason
+   the lightbox opened with the caption and an invisible picture, which is
+   exactly the failure that hid the Chanel piece. The whole panel already
+   fades in via .lb.is-open, so the per-image fade bought nothing and could
+   only ever fail open-with-nothing-showing. */
 .lb__frame img, .lb__frame video {
   max-width: 100%;
   max-height: calc(100svh - 260px);
   width: auto; object-fit: contain;
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.7);
-  opacity: 0; transform: scale(0.97);
-  transition: opacity 0.5s var(--ease-out), transform 0.6s var(--ease-out);
+  opacity: 1;
 }
-.lb.is-ready .lb__frame img, .lb.is-ready .lb__frame video { opacity: 1; transform: none; }
 .lb.is-light .lb__frame img { background: #f2f2ef; padding: 3rem; }
 
 .lb__nav {
