@@ -103,7 +103,7 @@ RS.works = [
   {
     id: "chanel", ar: 1, title: "Chanel — Fragrance", client: "Spec work", cat: "ads", year: "2025",
     tools: ["Photoshop"], type: "image",
-    src: "Media/web/ads/chanel.jpg", thumb: "Media/web/ads/chanel-thumb.jpg",
+    src: "Media/web/ads/bleu-de-chanel.jpg", thumb: "Media/web/ads/bleu-de-chanel-thumb.jpg",
     blurb: "Luxury advertising study. Almost no colour, almost no type — the whole thing is lighting, product placement and restraint."
   },
 
