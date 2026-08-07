@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08080a">
+
+  <title>Work — Sulaymon Ruziboev</title>
+  <meta name="description" content="Full portfolio: brand identity, YouTube and Instagram channel design, advertising key visuals, product and apparel graphics, After Effects motion and animated presentations.">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Work — Sulaymon Ruziboev">
+  <meta property="og:description" content="36 projects across identity, content design, advertising, product and motion.">
+  <meta property="og:image" content="Media/web/product/z-fold-7-v1.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/main.css">
+</head>
+
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header data-header></header>
+  <div data-menu></div>
+
+  <main id="main">
+
+    <section class="phero">
+      <div class="phero__glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a href="index.html">Home</a><span>/</span><span aria-current="page">Work</span>
+        </nav>
+        <div class="phero__grid">
+          <h1 class="phero__title lines">
+            <span>Selected</span>
+            <span class="thin">Work</span>
+          </h1>
+          <div>
+            <p class="lead" data-reveal style="--d:.1s">
+              Everything worth showing, in one place. Filter by discipline, hover the
+              motion pieces to play them, and click any project to open it full size.
+            </p>
+            <p class="count-chip" style="margin-top:1rem" data-reveal style="--d:.2s">
+              <span data-grid-count>—</span> projects
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section wrap">
+      <div class="filters" role="tablist" aria-label="Filter work by category" data-filters></div>
+      <div class="grid" data-work-grid></div>
+    </section>
+
+    <section class="cta">
+      <div class="cta__glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <p class="eyebrow eyebrow--plain" data-reveal>Seen something you like?</p>
+        <h2 class="cta__title lines" data-reveal="fade">
+          <span><a href="contact.html">Let's talk</a></span>
+        </h2>
+        <a href="contact.html" class="btn btn--solid" data-magnetic data-reveal style="--d:.15s">
+          Start a project
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer data-footer></footer>
+
+  <script>
+    window.RS = window.RS || {};
+    RS.page = function (ctx) {
+      const { $, $$, esc, initGrid } = ctx;
+
+      const grid = initGrid($("[data-work-grid]"), RS.works);
+      const countEl = $("[data-grid-count]");
+      const setCount = (n) => { if (countEl) countEl.textContent = String(n).padStart(2, "0"); };
+      setCount(RS.works.length);
+
+      /* Filters, with a live count per category so empty ones are obvious. */
+      const host = $("[data-filters]");
+      const tally = (id) =>
+        id === "all" ? RS.works.length : RS.works.filter((w) => w.cat === id).length;
+
+      host.innerHTML = RS.categories
+        .filter((c) => tally(c.id) > 0)
+        .map((c) => `
+          <button type="button" class="filter" role="tab" data-cat="${esc(c.id)}"
+                  aria-selected="false">${esc(c.label)}<sup>${tally(c.id)}</sup></button>`)
+        .join("");
+
+      function apply(cat, push) {
+        $$(".filter", host).forEach((b) => {
+          const on = b.dataset.cat === cat;
+          b.classList.toggle("is-active", on);
+          b.setAttribute("aria-selected", String(on));
+        });
+        setCount(grid.filter(cat));
+        if (push) history.replaceState(null, "", cat === "all" ? location.pathname : "#" + cat);
+      }
+
+      host.addEventListener("click", (e) => {
+        const b = e.target.closest(".filter");
+        if (b) apply(b.dataset.cat, true);
+      });
+
+      /* Deep links: work.html#logos lands pre-filtered. */
+      const initial = location.hash.replace("#", "");
+      apply(RS.categories.some((c) => c.id === initial) ? initial : "all", false);
+      addEventListener("hashchange", () => {
+        const h = location.hash.replace("#", "") || "all";
+        if (RS.categories.some((c) => c.id === h)) apply(h, false);
+      });
+    };
+  </script>
+
+  <script defer src="assets/js/data.js"></script>
+  <script defer src="assets/js/main.js"></script>
+</body>
+</html>

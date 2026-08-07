@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="SR">
+  <rect width="64" height="64" rx="10" fill="#f4f4f2"/>
+  <!-- Flat fill only. No stroke (it haloed and read as a drop shadow) and
+       no lengthAdjust (it stretched the glyphs and made them look heavy).
+       Baseline at 53 centres the cap-height block in the 64px square. -->
+  <text x="32" y="53"
+        font-family="Impact, Haettenschweiler, 'Arial Narrow Bold', system-ui, sans-serif"
+        font-size="58" letter-spacing="-2"
+        text-anchor="middle" fill="#4c1d95">SR</text>
+</svg>
