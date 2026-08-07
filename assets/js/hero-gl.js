@@ -232,9 +232,14 @@ function createHeroGL(canvas, sources, hooks = {}) {
     uniforms.uSizeA.value.copy(sizes[0]);
     uniforms.uSizeB.value.copy(sizes[0]);
     resize();
+    // Paint the first frame explicitly. The loop below only draws while a
+    // crossfade is running or the canvas resized, so without this the
+    // canvas stays blank until the first slide change — and `gl-ready` has
+    // already faded out the CSS fallback behind it.
+    render();
     ready = true;
     hooks.onReady?.();
-    if (reduced) render(); else tick();
+    if (!reduced) tick();
   });
 
   return {
