@@ -1,17 +1,16 @@
 /* =====================================================================
    HERO — WebGL (Three.js)
    ---------------------------------------------------------------------
-   A single full-screen quad running a fragment shader that:
-     • cover-fits two textures regardless of their aspect ratio
-     • melts between them along a simplex-noise displacement field
-     • warps UVs around the pointer with eased momentum
-     • adds chromatic aberration that scales with pointer velocity
-     • breathes (slow zoom) and vignettes
+   A single quad that contain-fits two textures regardless of their aspect
+   ratio and crossfades between them. That is the whole effect.
+
+   No displacement, noise, pointer warp, chromatic aberration, zoom or
+   colour grade: the slides are finished design pieces, and distorting one
+   reads as a broken render rather than as craft. Pixels are sampled 1:1
+   from the source and only blended by opacity.
 
    Degrades on purpose: if WebGL is unavailable, the module never marks
-   the hero `gl-ready`, so the CSS crossfade fallback stays visible.
-   Under prefers-reduced-motion the loop is not started at all — one
-   still frame is rendered instead.
+   the hero `gl-ready`, so the CSS fallback stays visible.
    ===================================================================== */
 
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js";
@@ -33,48 +32,15 @@ const FRAG = /* glsl */ `
   uniform vec2  uSizeB;
   uniform vec2  uRes;        // canvas size in px
   uniform float uProgress;   // 0 -> A, 1 -> B
-  uniform float uTime;
-  uniform float uPower;      // global intensity (0 disables motion)
 
   varying vec2 vUv;
 
-  /* ---- simplex noise (Ashima / webgl-noise, 2D) ---- */
-  vec3 mod289(vec3 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
-  vec2 mod289(vec2 x){ return x - floor(x * (1.0/289.0)) * 289.0; }
-  vec3 permute(vec3 x){ return mod289(((x*34.0)+1.0)*x); }
-  float snoise(vec2 v){
-    const vec4 C = vec4(0.211324865405187, 0.366025403784439,
-                       -0.577350269189626, 0.024390243902439);
-    vec2 i  = floor(v + dot(v, C.yy));
-    vec2 x0 = v -   i + dot(i, C.xx);
-    vec2 i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
-    vec4 x12 = x0.xyxy + C.xxzz;
-    x12.xy -= i1;
-    i = mod289(i);
-    vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0))
-                             + i.x + vec3(0.0, i1.x, 1.0));
-    vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-    m = m*m; m = m*m;
-    vec3 x = 2.0 * fract(p * C.www) - 1.0;
-    vec3 h = abs(x) - 0.5;
-    vec3 ox = floor(x + 0.5);
-    vec3 a0 = x - ox;
-    m *= 1.79284291400159 - 0.85373472095314 * (a0*a0 + h*h);
-    vec3 g;
-    g.x  = a0.x  * x0.x  + h.x  * x0.y;
-    g.yz = a0.yz * x12.xz + h.yz * x12.yw;
-    return 130.0 * dot(m, g);
-  }
-
   /* ---- background-size: contain, in UV space ----
-     The whole artwork must stay visible: these are design pieces with
-     their own typography, and cropping them mid-word looks broken.
-     INSET leaves a margin so the melt displacement never pushes the
-     image past the panel edge. */
-  const float INSET = 1.0;
+     The whole artwork stays visible: these are finished design pieces with
+     their own typography, and cropping one mid-word looks broken. */
   vec2 containUv(vec2 uv, vec2 res, vec2 img) {
     vec2 s = res / img;
-    float scale = min(s.x, s.y) * INSET;
+    float scale = min(s.x, s.y);
     vec2 size = img * scale;
     vec2 offset = (res - size) * 0.5;
     return (uv * res - offset) / size;
@@ -88,41 +54,17 @@ const FRAG = /* glsl */ `
   }
 
   void main() {
-    vec2 uv = vUv;
+    /* Straight crossfade. No noise, no displacement, no aberration, no
+       grade, no vignette — every pixel is the source artwork, sampled 1:1
+       and only blended by opacity. */
+    vec2 uvA = containUv(vUv, uRes, uSizeA);
+    vec2 uvB = containUv(vUv, uRes, uSizeB);
 
-    /* The artwork is shown EXACTLY as authored while idle.
-       No pointer warp, no chromatic aberration, no zoom, no grade — these
-       are finished design pieces, and distorting one reads as a broken
-       render rather than as an effect. The shader's only job is the
-       dissolve between slides. */
+    vec3 backdrop = vec3(0.055, 0.055, 0.065);
+    vec3 colA = mix(backdrop, texture2D(uTexA, uvA).rgb, inside(uvA));
+    vec3 colB = mix(backdrop, texture2D(uTexB, uvB).rgb, inside(uvB));
 
-    /* Noise field used purely as the dissolve mask. */
-    float n  = snoise(uv * 2.6 + uTime * 0.055);
-    float n2 = snoise(uv * 7.0 - uTime * 0.09) * 0.35;
-    float t  = clamp((n + n2) * 0.5 + 0.5, 0.0, 1.0);
-
-    /* Noise-threshold dissolve. Exactly 0 at uProgress 0 and exactly 1 at
-       uProgress 1, so an idle hero is a pristine single image with no
-       ghosting of the next slide. */
-    const float BAND = 0.35;
-    float p = uProgress * (1.0 + 2.0 * BAND) - BAND;
-    float mixAmt = smoothstep(t - BAND, t + BAND, p);
-
-    /* A whisper of displacement, and only mid-transition — sin() puts it
-       at zero whenever the hero is at rest. */
-    float turbulence = sin(uProgress * 3.14159);
-    vec2 disp = vec2(n, n2) * 0.035 * turbulence * uPower;
-
-    vec2 uvA = containUv(uv + disp * (1.0 - mixAmt), uRes, uSizeA);
-    vec2 uvB = containUv(uv - disp * mixAmt,         uRes, uSizeB);
-
-    vec3 col = mix(texture2D(uTexA, uvA).rgb, texture2D(uTexB, uvB).rgb, mixAmt);
-
-    /* Letterbox: fade to the panel colour outside the artwork rect. */
-    float m = mix(inside(uvA), inside(uvB), mixAmt);
-    col = mix(vec3(0.055, 0.055, 0.065), col, m);
-
-    gl_FragColor = vec4(col, 1.0);
+    gl_FragColor = vec4(mix(colA, colB, uProgress), 1.0);
   }
 `;
 
@@ -155,8 +97,6 @@ function createHeroGL(canvas, sources, hooks = {}) {
     uSizeB:    { value: new THREE.Vector2(1, 1) },
     uRes:      { value: new THREE.Vector2(1, 1) },
     uProgress: { value: 0 },
-    uTime:     { value: 0 },
-    uPower:    { value: reduced ? 0 : 1 },
   };
 
   scene.add(new THREE.Mesh(
@@ -220,14 +160,14 @@ function createHeroGL(canvas, sources, hooks = {}) {
   function resize() {
     const w = canvas.clientWidth || innerWidth;
     const h = canvas.clientHeight || innerHeight;
-    if (w === lastW && h === lastH) return;
+    if (w === lastW && h === lastH) return false;
     lastW = w; lastH = h;
     renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     renderer.setSize(w, h, false);
     uniforms.uRes.value.set(w, h);
-    if (reduced) render();
+    return true;
   }
-  addEventListener("resize", resize);
+  addEventListener("resize", () => { if (resize()) render(); });
 
   /* ---------- loop ---------- */
   const clock = new THREE.Clock();
@@ -240,21 +180,22 @@ function createHeroGL(canvas, sources, hooks = {}) {
     rafId = requestAnimationFrame(tick);
     if (!visible) return;
 
-    resize(); // no-op unless the laid-out size actually changed
+    // Nothing animates at rest now, so only redraw when the crossfade is
+    // running or the canvas actually changed size.
+    const resized = resize();
+    if (!animating) {
+      if (resized) render();
+      return;
+    }
 
-    const t = clock.getElapsedTime();
-    uniforms.uTime.value = t;
-
-    if (animating) {
-      const p = Math.min((t - tStart) / tDur, 1);
-      // easeInOutCubic
-      uniforms.uProgress.value = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-      if (p >= 1) {
-        animating = false;
-        uniforms.uTexA.value = textures[to];
-        uniforms.uSizeA.value.copy(sizes[to]);
-        uniforms.uProgress.value = 0;
-      }
+    const p = Math.min((clock.getElapsedTime() - tStart) / tDur, 1);
+    // easeInOutCubic
+    uniforms.uProgress.value = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+    if (p >= 1) {
+      animating = false;
+      uniforms.uTexA.value = textures[to];
+      uniforms.uSizeA.value.copy(sizes[to]);
+      uniforms.uProgress.value = 0;
     }
     render();
   }

@@ -612,32 +612,73 @@
   /* =================================================================
      WORK GRID
      ================================================================= */
-  /* Row-packing for the mosaic.
-     The grid is 12 columns, so a run of `span 8` cards each strand 4 empty
-     columns. Instead of tagging each work with a fixed width, spans are
-     assigned per row from patterns that always total exactly 12 — the grid
-     is then flush at any item count, including filtered subsets. */
-  const ROW_PATTERNS = [[8, 4], [4, 4, 4], [6, 6], [4, 8], [6, 6], [4, 4, 4], [8, 4], [5, 7]];
+  /* ---------------------------------------------------------------
+     JUSTIFIED LAYOUT
 
-  function layoutSpans(n) {
-    const out = [];
-    let p = 0;
-    while (out.length < n) {
-      const left = n - out.length;
-      let row;
-      if (left <= 3) {
-        row = left === 1 ? [12] : left === 2 ? [6, 6] : [4, 4, 4];
-      } else {
-        row = ROW_PATTERNS[p % ROW_PATTERNS.length];
-        if (row.length > left) row = left === 2 ? [6, 6] : [4, 4, 4];
+     A fixed-shape grid forces every card into the same box, so artwork
+     has to be cropped to fill it (object-fit: cover) or letterboxed to
+     avoid cropping (contain). Neither is acceptable for a portfolio.
+
+     Instead each card takes its artwork's own aspect ratio, and a row's
+     height is solved so the widths sum to exactly the container width:
+
+         rowHeight = (containerWidth - gaps) / Σ aspectRatios
+
+     Every row is then flush left and right with no empty space, and no
+     image is cropped, because each card is exactly its picture's shape.
+
+     Row breaks come from a DP that splits the sequence into a fixed
+     number of contiguous rows minimising deviation from a target height.
+     A greedy fill would leave a short final row (the classic ragged last
+     line); solving for an exact row count means every row fills.
+     --------------------------------------------------------------- */
+  function justify(ratios, containerW, gap, targetH) {
+    const n = ratios.length;
+    if (!n || containerW <= 0) return [];
+
+    const rowHeight = (i, j) => {
+      let sum = 0;
+      for (let x = i; x <= j; x++) sum += ratios[x];
+      return (containerW - gap * (j - i)) / sum;
+    };
+
+    // Aim for the row count that lands closest to the target height.
+    const totalAr = ratios.reduce((a, b) => a + b, 0);
+    let k = Math.max(1, Math.round((totalAr * targetH) / containerW));
+    k = Math.min(k, n);
+
+    // best[r][i] = least cost to split items i..n-1 into exactly r rows
+    const INF = Infinity;
+    const best = Array.from({ length: k + 1 }, () => new Array(n + 1).fill(INF));
+    const cut = Array.from({ length: k + 1 }, () => new Array(n + 1).fill(-1));
+    best[0][n] = 0;
+
+    for (let r = 1; r <= k; r++) {
+      for (let i = n - 1; i >= 0; i--) {
+        // leave at least one item for each remaining row
+        const maxJ = n - (r - 1) - 1;
+        for (let j = i; j <= maxJ; j++) {
+          const rest = best[r - 1][j + 1];
+          if (rest === INF) continue;
+          const h = rowHeight(i, j);
+          const cost = (h - targetH) * (h - targetH) + rest;
+          if (cost < best[r][i]) { best[r][i] = cost; cut[r][i] = j; }
+        }
       }
-      out.push(...row);
-      p++;
     }
-    return out;
+
+    const rows = [];
+    let i = 0;
+    for (let r = k; r >= 1 && i < n; r--) {
+      const j = cut[r][i];
+      if (j < 0) { rows.push({ from: i, to: n - 1, h: rowHeight(i, n - 1) }); break; }
+      rows.push({ from: i, to: j, h: rowHeight(i, j) });
+      i = j + 1;
+    }
+    return rows;
   }
 
-  function cardHTML(w, i, span) {
+  function cardHTML(w, i) {
     const light = w.light ? " is-light" : "";
     const poster = w.type === "video" ? w.poster : w.thumb || w.src;
     const badge = w.type === "video"
@@ -651,7 +692,7 @@
     return `
       <button type="button" class="card${light}" data-cat="${esc(w.cat)}"
               data-id="${esc(w.id)}" data-i="${i}" data-cursor="View"
-              style="--d:${(i % 6) * 0.06}s;--span:${span}"
+              style="--d:${(i % 6) * 0.06}s"
               aria-label="${esc(w.title)} — open project">
         <span class="card__media">
           <img src="${url(poster)}" alt="${esc(w.title)}" loading="lazy" decoding="async">
@@ -692,14 +733,63 @@
     let list = works.slice();
 
     function paint(items) {
-      const spans = layoutSpans(items.length);
-      root.innerHTML = items.length
-        ? items.map((w, i) => cardHTML(w, i, spans[i])).join("")
-        : `<p class="grid-empty">Nothing here yet — try another filter.</p>`;
+      if (!items.length) {
+        root.innerHTML = `<p class="grid-empty">Nothing here yet — try another filter.</p>`;
+        opts.onPaint?.(items);
+        return;
+      }
+      root.innerHTML = `<div class="grid__rows">${items.map(cardHTML).join("")}</div>`;
       $$(".card", root).forEach((c) => cardIO.observe(c));
       wireCards(root, items);
+      measure(items);
       opts.onPaint?.(items);
     }
+
+    /* Size the cards. Re-run on resize because both the container width
+       and the target row height are viewport-dependent. */
+    function measure(items) {
+      const host = $(".grid__rows", root);
+      if (!host) return;
+      const cards = $$(".card", host);
+      if (!cards.length) return;
+
+      const cs = getComputedStyle(host);
+      const gap = parseFloat(cs.gap) || 0;
+      const width = host.clientWidth;
+      if (!width) return;
+
+      // Narrow screens: one full-width card per row, natural height.
+      if (width < 620) {
+        cards.forEach((c, i) => {
+          const ar = items[i].ar || 1.6;
+          c.style.width = "100%";
+          c.style.height = Math.round(width / ar) + "px";
+        });
+        return;
+      }
+
+      const targetH = width < 1000 ? width * 0.34 : Math.min(width * 0.26, 380);
+      const ratios = items.map((w) => w.ar || 1.6);
+      const rows = justify(ratios, width, gap, targetH);
+
+      rows.forEach((row) => {
+        for (let i = row.from; i <= row.to; i++) {
+          const card = cards[i];
+          if (!card) continue;
+          card.style.height = Math.round(row.h) + "px";
+          // flex-basis carries the width; grow/shrink off so the solved
+          // widths are honoured exactly and the row stays flush.
+          card.style.flex = `0 0 ${(ratios[i] * row.h).toFixed(2)}px`;
+          card.style.width = "";
+        }
+      });
+    }
+
+    let resizeRaf = 0;
+    addEventListener("resize", () => {
+      cancelAnimationFrame(resizeRaf);
+      resizeRaf = requestAnimationFrame(() => measure(list));
+    });
 
     function wireCards(scope, items) {
       $$(".card", scope).forEach((card) => {
@@ -708,15 +798,30 @@
 
         const video = $("video", card);
         if (!video) return;
-        let started = false;
+        let started = false;   // src attached yet?
+        let hovering = false;
+
+        /* Only reveal the video once it genuinely has frames. Swapping on
+           pointerenter hides the poster while the element is still empty,
+           which shows as a grey box for as long as the file takes to
+           buffer. `playing` fires after the first frame is presented. */
+        video.addEventListener("playing", () => {
+          if (hovering) card.classList.add("is-playing");
+        });
+
         card.addEventListener("pointerenter", () => {
           if (REDUCED) return;
-          if (!started) { video.src = video.dataset.src; started = true; }
+          hovering = true;
+          if (!started) {
+            video.src = video.dataset.src;
+            started = true;
+          }
           const p = video.play();
-          if (p && p.catch) p.catch(() => {});
-          card.classList.add("is-playing");
+          if (p && p.catch) p.catch(() => {});   // autoplay refusal: keep poster
         });
+
         card.addEventListener("pointerleave", () => {
+          hovering = false;
           video.pause();
           card.classList.remove("is-playing");
         });

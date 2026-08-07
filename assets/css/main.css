@@ -229,28 +229,27 @@ input, textarea, select { font: inherit; color: inherit; }
   display: grid;
   grid-template-columns: repeat(5, 1fr);
 }
+/* scaleX(1.02) makes each column overrun its grid track so neighbours
+   overlap. Without it, fractional track widths plus transform antialiasing
+   leave hairline seams between the panels. */
 .pt__col {
-  background: var(--bg);
-  transform: scaleY(0);
+  background: #ffffff;
+  transform: scale(1.02, 0);
   transform-origin: bottom;
   will-change: transform;
-}
-.pt__col::after {
-  content: ""; position: absolute; inset: auto 0 0 0; height: 2px;
-  background: var(--accent); opacity: 0;
 }
 
 /* leaving: grow up from the bottom */
 .pt.is-out .pt__col {
-  transform: scaleY(1);
+  transform: scale(1.02, 1);
   transform-origin: bottom;
   transition: transform 0.42s var(--ease-io);
   transition-delay: calc(var(--i) * 0.045s);
 }
 /* arriving: start covered, retract upward */
-.pt.is-cover .pt__col { transform: scaleY(1); transform-origin: top; }
+.pt.is-cover .pt__col { transform: scale(1.02, 1); transform-origin: top; }
 .pt.is-in .pt__col {
-  transform: scaleY(0);
+  transform: scale(1.02, 0);
   transform-origin: top;
   transition: transform 0.55s var(--ease-out);
   transition-delay: calc((4 - var(--i)) * 0.045s);
@@ -804,24 +803,22 @@ body.menu-open .menu__link {
 .filter.is-active { color: #fff; background: var(--accent); border-color: var(--accent); }
 .filter sup { font-size: 0.65em; opacity: 0.7; margin-left: 0.3em; }
 
-/* Fixed row height + variable column spans. Cards fill their row rather
-   than sizing themselves from an aspect ratio, so a wide card and a narrow
-   card in the same row are always the same height and rows stay flush. */
-.grid {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-auto-rows: clamp(200px, 23vw, 380px);
+/* Justified layout. Widths and heights are solved in JS (see justify() in
+   main.js) so each card keeps its artwork's exact aspect ratio while every
+   row still spans the full container width. Nothing is cropped and no row
+   has a gap at the end. */
+.grid__rows {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: clamp(0.9rem, 1.6vw, 1.6rem);
 }
 
 /* The card is a <button> built from spans, so the block-level
    display values have to be declared rather than inherited. */
 .card {
-  grid-column: span var(--span, 4);
   position: relative;
   display: block;
-  width: 100%;
-  height: 100%;
   text-align: left;
   background: var(--surface);
   overflow: hidden;
@@ -840,26 +837,44 @@ body.menu-open .menu__link {
   background: var(--surface-2);
 }
 
+/* Poster and video are stacked in the same box, both absolutely
+   positioned. Declare position ONCE here — a later rule re-declaring
+   these selectors at equal specificity silently wins and drops the video
+   out of the stack into normal flow. */
+/* Poster and video are stacked in the same box, both absolutely
+   positioned. Declare position ONCE here — a later rule re-declaring
+   these selectors at equal specificity silently wins and drops the video
+   out of the stack into normal flow.
+
+   No resting scale and no resting filter: the card is already cut to the
+   artwork's exact aspect ratio, so at rest the piece is shown whole, at
+   full saturation, edge to edge. */
 .card__media img,
 .card__media video {
+  position: absolute;
+  inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
-  transform: scale(1.02);
-  transition: transform 0.9s var(--ease-out), filter 0.6s var(--ease-out);
-  filter: saturate(0.85) brightness(0.9);
+  transform: scale(1);
+  transition: transform 0.9s var(--ease-out),
+              opacity 0.45s var(--ease-out);
 }
+.card__media img   { z-index: 1; }
+.card__media video { z-index: 2; opacity: 0; }
+
+/* Transient hover push-in only. Delete this block for zero crop ever. */
 .card:hover .card__media img,
 .card:hover .card__media video {
-  transform: scale(1.07);
-  filter: saturate(1.05) brightness(1);
+  transform: scale(1.04);
 }
-.card__media video { position: absolute; inset: 0; opacity: 0; transition: opacity 0.45s var(--ease-out); }
 .card.is-playing .card__media video { opacity: 1; }
 .card.is-playing .card__media img { opacity: 0; }
 
+/* Transparent logo PNGs need a light tile and breathing room around the
+   mark — the one case where `contain` is correct. */
 .card.is-light .card__media { background: #f2f2ef; }
-.card.is-light .card__media img { object-fit: contain; padding: 12%; filter: none; }
-.card.is-light:hover .card__media img { transform: scale(1.04); }
+.card.is-light .card__media img { object-fit: contain; padding: 9%; }
+.card.is-light:hover .card__media img { transform: scale(1.03); }
 
 /* Loading shimmer until the image decodes */
 .card__media::before {
@@ -871,9 +886,6 @@ body.menu-open .menu__link {
 }
 .card.is-loaded .card__media::before { opacity: 0; animation: none; }
 @keyframes shimmer { to { background-position: -220% 0; } }
-
-.card__media img, .card__media video { position: relative; z-index: 1; }
-.card__media video { z-index: 2; }
 
 .card__veil {
   position: absolute; inset: 0; z-index: 3; pointer-events: none;
@@ -933,7 +945,6 @@ body.menu-open .menu__link {
 .card.is-hidden { display: none; }
 
 .grid-empty {
-  grid-column: 1 / -1;
   padding: var(--s-7) 0;
   text-align: center; color: var(--ink-3);
 }
@@ -1398,12 +1409,7 @@ body.menu-open .menu__link {
   .about-grid, .contact-grid, .phero__grid { grid-template-columns: 1fr; }
   .phero__grid { gap: var(--s-3); align-items: start; }
   .portrait { max-width: 420px; }
-  /* Ignore the packed spans below tablet — two even columns read better.
-     An odd item count would strand the last card in a half-empty row, so
-     it goes full width instead. */
-  .card { grid-column: span 6; }
-  .card:last-child:nth-child(odd) { grid-column: span 12; }
-  .grid { grid-auto-rows: clamp(180px, 30vw, 300px); }
+  /* Card sizing is solved in JS — nothing to override here. */
 }
 
 @media (max-width: 760px) {
@@ -1416,8 +1422,6 @@ body.menu-open .menu__link {
 }
 
 @media (max-width: 560px) {
-  .card { grid-column: span 12; }
-  .grid { grid-auto-rows: clamp(200px, 62vw, 300px); }
   .card__meta { max-height: 3em; opacity: 1; margin-top: 0.25rem; }
   .nav__right { gap: 0.9rem; }
   .burger__text { display: none; }
