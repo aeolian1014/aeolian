@@ -202,22 +202,6 @@ input, textarea, select { font: inherit; color: inherit; }
   mix-blend-mode: screen;
 }
 
-/* Film grain — unifies the whole page */
-.grain {
-  position: fixed; inset: -150%;
-  z-index: 9000; pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
-  animation: grain-shift 0.7s steps(4) infinite;
-}
-@keyframes grain-shift {
-  0%   { transform: translate(0, 0); }
-  25%  { transform: translate(-3%, 2%); }
-  50%  { transform: translate(2%, -3%); }
-  75%  { transform: translate(-2%, -2%); }
-  100% { transform: translate(0, 0); }
-}
-
 /* Page transition curtain.
    Columns wipe up to cover on the way out, then wipe up and away on the
    next page. Inert (scaleY 0, no pointer events) unless a transition is
@@ -536,14 +520,6 @@ body.menu-open .menu__link {
   background: var(--bg);
   padding-block: calc(var(--header-h) + clamp(1.5rem, 4vh, 3rem)) clamp(4rem, 10vh, 6rem);
   overflow: hidden;
-}
-
-.hero__glow {
-  position: absolute; z-index: 0; pointer-events: none;
-  top: 50%; right: -10%; transform: translateY(-50%);
-  width: min(900px, 80vw); aspect-ratio: 1;
-  background: radial-gradient(circle, rgba(255,107,18,0.13), transparent 62%);
-  filter: blur(10px);
 }
 
 .hero__content {
@@ -1403,7 +1379,6 @@ body.menu-open .menu__link {
   .hero { min-height: 0; }
   .hero__content { grid-template-columns: 1fr; gap: clamp(2rem, 6vw, 3rem); }
   .hero__title { font-size: clamp(2.4rem, 9vw, 4rem); }
-  .hero__glow { right: -40%; top: 30%; }
   .menu__body { grid-template-columns: 1fr; gap: var(--s-4); }
   .menu__aside { display: none; }
   .about-grid, .contact-grid, .phero__grid { grid-template-columns: 1fr; }
@@ -1442,6 +1417,5 @@ body.menu-open .menu__link {
   .hero__sub, .hero__actions, .hero__bottom {
     opacity: 1 !important; transform: none !important; clip-path: none !important;
   }
-  .grain { animation: none; }
   .cursor-fx { display: none; }
 }

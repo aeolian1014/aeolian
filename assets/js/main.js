@@ -42,7 +42,7 @@
   })();
 
   /* =================================================================
-     SHELL — header, menu overlay, footer, cursor, grain
+     SHELL — header, menu overlay, footer
      ================================================================= */
   function renderShell() {
     const c = RS.contact;
@@ -173,13 +173,6 @@
         </div>`;
     }
 
-    /* ---- decorative layers ---- */
-    if (!$(".grain")) {
-      const g = document.createElement("div");
-      g.className = "grain";
-      g.setAttribute("aria-hidden", "true");
-      document.body.appendChild(g);
-    }
   }
 
   /* =================================================================

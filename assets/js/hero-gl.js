@@ -84,6 +84,17 @@ function createHeroGL(canvas, sources, hooks = {}) {
   }
   if (!renderer.getContext()) return null;
 
+  /* Colour passthrough.
+     Three.js normally decodes an sRGB texture to linear on sample and
+     re-encodes to sRGB on output — but the re-encode lives in the
+     `colorspace_fragment` chunk, which built-in materials include and a
+     custom ShaderMaterial does not. Leaving the texture as SRGBColorSpace
+     therefore decoded to linear and wrote linear straight out, lifting and
+     desaturating the artwork. Decoding nothing and encoding nothing means
+     the stored pixels arrive on screen exactly as authored. */
+  renderer.outputColorSpace = THREE.LinearSRGBColorSpace;
+  renderer.toneMapping = THREE.NoToneMapping;
+
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.setSize(canvas.clientWidth, canvas.clientHeight, false);
 
@@ -113,7 +124,7 @@ function createHeroGL(canvas, sources, hooks = {}) {
     loader.load(
       url,
       (tex) => {
-        tex.colorSpace = THREE.SRGBColorSpace;
+        tex.colorSpace = THREE.NoColorSpace;   // no decode — see passthrough note
         tex.minFilter = THREE.LinearFilter;
         tex.magFilter = THREE.LinearFilter;
         tex.generateMipmaps = false;
