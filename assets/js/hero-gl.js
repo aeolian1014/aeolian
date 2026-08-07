@@ -34,9 +34,6 @@ const FRAG = /* glsl */ `
   uniform vec2  uRes;        // canvas size in px
   uniform float uProgress;   // 0 -> A, 1 -> B
   uniform float uTime;
-  uniform vec2  uMouse;      // eased, 0..1
-  uniform float uVelocity;   // eased pointer speed
-  uniform float uScroll;     // 0..1 through the hero
   uniform float uPower;      // global intensity (0 disables motion)
 
   varying vec2 vUv;
@@ -74,7 +71,7 @@ const FRAG = /* glsl */ `
      their own typography, and cropping them mid-word looks broken.
      INSET leaves a margin so the melt displacement never pushes the
      image past the panel edge. */
-  const float INSET = 0.93;
+  const float INSET = 1.0;
   vec2 containUv(vec2 uv, vec2 res, vec2 img) {
     vec2 s = res / img;
     float scale = min(s.x, s.y) * INSET;
@@ -93,60 +90,37 @@ const FRAG = /* glsl */ `
   void main() {
     vec2 uv = vUv;
 
-    /* No breathing zoom here: the artwork is contained, so any zoom > 1
-       would crop it. Depth comes from a slow scroll-driven drift instead. */
-    vec2 cuv = uv + vec2(0.0, uScroll * 0.035);
+    /* The artwork is shown EXACTLY as authored while idle.
+       No pointer warp, no chromatic aberration, no zoom, no grade — these
+       are finished design pieces, and distorting one reads as a broken
+       render rather than as an effect. The shader's only job is the
+       dissolve between slides. */
 
-    /* --- pointer well: pull pixels toward the cursor, falls off fast --- */
-    vec2 toMouse = cuv - uMouse;
-    toMouse.x *= uRes.x / uRes.y;             // keep the well circular
-    float dist = length(toMouse);
-    float well = smoothstep(0.42, 0.0, dist);
-    float pull = well * (0.030 + uVelocity * 0.10) * uPower;
-    cuv -= normalize(toMouse + 1e-5) * pull;
+    /* Noise field used purely as the dissolve mask. */
+    float n  = snoise(uv * 2.6 + uTime * 0.055);
+    float n2 = snoise(uv * 7.0 - uTime * 0.09) * 0.35;
+    float t  = clamp((n + n2) * 0.5 + 0.5, 0.0, 1.0);
 
-    /* --- melt field: two octaves of noise, one slow one fast --- */
-    float n  = snoise(cuv * 2.6 + uTime * 0.055);
-    float n2 = snoise(cuv * 7.0 - uTime * 0.09) * 0.35;
-    float field = n + n2;
+    /* Noise-threshold dissolve. Exactly 0 at uProgress 0 and exactly 1 at
+       uProgress 1, so an idle hero is a pristine single image with no
+       ghosting of the next slide. */
+    const float BAND = 0.35;
+    float p = uProgress * (1.0 + 2.0 * BAND) - BAND;
+    float mixAmt = smoothstep(t - BAND, t + BAND, p);
 
-    /* Progress runs a soft edge across the noise field so the images
-       dissolve into each other instead of cross-fading flatly. */
-    float p = smoothstep(0.0, 1.0, uProgress);
-    float edge = smoothstep(p - 0.42, p + 0.42, (field * 0.5 + 0.5) * 0.55 + p * 0.6);
-    float mixAmt = 1.0 - edge;
+    /* A whisper of displacement, and only mid-transition — sin() puts it
+       at zero whenever the hero is at rest. */
+    float turbulence = sin(uProgress * 3.14159);
+    vec2 disp = vec2(n, n2) * 0.035 * turbulence * uPower;
 
-    /* Displacement peaks mid-transition, so it settles when idle. */
-    float turbulence = sin(p * 3.14159) ;
-    vec2 disp = vec2(field, snoise(cuv * 3.1 - uTime * 0.04)) * 0.075 * turbulence * uPower;
+    vec2 uvA = containUv(uv + disp * (1.0 - mixAmt), uRes, uSizeA);
+    vec2 uvB = containUv(uv - disp * mixAmt,         uRes, uSizeB);
 
-    vec2 uvA = containUv(cuv + disp * (1.0 - mixAmt), uRes, uSizeA);
-    vec2 uvB = containUv(cuv - disp * mixAmt,         uRes, uSizeB);
+    vec3 col = mix(texture2D(uTexA, uvA).rgb, texture2D(uTexB, uvB).rgb, mixAmt);
 
-    /* --- chromatic aberration, strongest near a fast-moving cursor --- */
-    float ca = (0.0016 + uVelocity * 0.010 + turbulence * 0.004) * uPower;
-    vec2 dir = normalize(toMouse + 1e-5) * well;
-
-    vec3 colA, colB;
-    colA.r = texture2D(uTexA, uvA + dir * ca).r;
-    colA.g = texture2D(uTexA, uvA).g;
-    colA.b = texture2D(uTexA, uvA - dir * ca).b;
-    colB.r = texture2D(uTexB, uvB + dir * ca).r;
-    colB.g = texture2D(uTexB, uvB).g;
-    colB.b = texture2D(uTexB, uvB - dir * ca).b;
-
-    vec3 col = mix(colA, colB, mixAmt);
-
-    /* --- ember bloom under the cursor --- */
-    col += vec3(1.0, 0.42, 0.07) * well * (0.05 + uVelocity * 0.22) * uPower;
-
-    /* --- gentle contrast lift; no vignette, it would dirty the artwork --- */
-    col = mix(col, col * col * (3.0 - 2.0 * col), 0.12);
-
-    /* --- letterbox: fade to the panel colour outside the artwork rect --- */
+    /* Letterbox: fade to the panel colour outside the artwork rect. */
     float m = mix(inside(uvA), inside(uvB), mixAmt);
-    vec3 backdrop = vec3(0.055, 0.055, 0.065);
-    col = mix(backdrop, col, m);
+    col = mix(vec3(0.055, 0.055, 0.065), col, m);
 
     gl_FragColor = vec4(col, 1.0);
   }
@@ -182,9 +156,6 @@ function createHeroGL(canvas, sources, hooks = {}) {
     uRes:      { value: new THREE.Vector2(1, 1) },
     uProgress: { value: 0 },
     uTime:     { value: 0 },
-    uMouse:    { value: new THREE.Vector2(0.5, 0.5) },
-    uVelocity: { value: 0 },
-    uScroll:   { value: 0 },
     uPower:    { value: reduced ? 0 : 1 },
   };
 
@@ -215,21 +186,6 @@ function createHeroGL(canvas, sources, hooks = {}) {
       () => { loadedCount++; hooks.onProgress?.(loadedCount / sources.length); resolve(null); }
     );
   });
-
-  /* ---------- pointer ---------- */
-  const target = { x: 0.5, y: 0.5 };
-  const eased = { x: 0.5, y: 0.5 };
-  let vTarget = 0, vEased = 0;
-  let lastX = 0.5, lastY = 0.5;
-
-  function onPointer(e) {
-    const r = canvas.getBoundingClientRect();
-    target.x = (e.clientX - r.left) / r.width;
-    target.y = 1 - (e.clientY - r.top) / r.height;
-    vTarget = Math.min(Math.hypot(target.x - lastX, target.y - lastY) * 12, 1);
-    lastX = target.x; lastY = target.y;
-  }
-  window.addEventListener("pointermove", onPointer, { passive: true });
 
   /* ---------- transition state ---------- */
   let current = 0;
@@ -289,18 +245,6 @@ function createHeroGL(canvas, sources, hooks = {}) {
     const t = clock.getElapsedTime();
     uniforms.uTime.value = t;
 
-    // ease pointer + velocity toward target (momentum sells the warp)
-    eased.x += (target.x - eased.x) * 0.055;
-    eased.y += (target.y - eased.y) * 0.055;
-    uniforms.uMouse.value.set(eased.x, eased.y);
-    vTarget *= 0.92;
-    vEased += (vTarget - vEased) * 0.08;
-    uniforms.uVelocity.value = vEased;
-
-    // hero scroll progress
-    const rect = canvas.getBoundingClientRect();
-    uniforms.uScroll.value = Math.min(Math.max(-rect.top / (rect.height || 1), 0), 1);
-
     if (animating) {
       const p = Math.min((t - tStart) / tDur, 1);
       // easeInOutCubic
@@ -329,10 +273,12 @@ function createHeroGL(canvas, sources, hooks = {}) {
       textures.push(tex);
       sizes.push(new THREE.Vector2(tex.image.naturalWidth || 1, tex.image.naturalHeight || 1));
     });
+    // Both slots start on the same frame, so the first paint can't ghost
+    // the next slide through the dissolve mask.
     uniforms.uTexA.value = textures[0];
-    uniforms.uTexB.value = textures[Math.min(1, textures.length - 1)];
+    uniforms.uTexB.value = textures[0];
     uniforms.uSizeA.value.copy(sizes[0]);
-    uniforms.uSizeB.value.copy(sizes[Math.min(1, sizes.length - 1)]);
+    uniforms.uSizeB.value.copy(sizes[0]);
     resize();
     ready = true;
     hooks.onReady?.();
@@ -347,7 +293,6 @@ function createHeroGL(canvas, sources, hooks = {}) {
       cancelAnimationFrame(rafId);
       io.disconnect();
       window.removeEventListener("resize", resize);
-      window.removeEventListener("pointermove", onPointer);
       textures.forEach((t) => t.dispose());
       renderer.dispose();
     },
