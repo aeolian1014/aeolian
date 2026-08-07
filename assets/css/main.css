@@ -6,7 +6,7 @@
    2.  Reset & base
    3.  Typography primitives
    4.  Layout primitives
-   5.  Cursor / grain / preloader
+   5.  Cursor / preloader
    6.  Header + menu overlay
    7.  Buttons & links
    8.  Hero (WebGL)
@@ -192,14 +192,17 @@ input, textarea, select { font: inherit; color: inherit; }
 
 .rule { height: 1px; background: var(--line); border: 0; }
 
-/* ========================= 5. CURSOR / GRAIN / PRELOADER ========================= */
-/* Cursor trail canvas. `screen` blending keeps the pixels glowing over
-   dark sections without dirtying light artwork underneath. */
+/* ========================= 5. CURSOR / PRELOADER ========================= */
+/* Cursor trail canvas.
+   NO mix-blend-mode. This element covers the whole viewport, and a blend
+   mode on it forces every pixel underneath into a blended compositing
+   group — tinting artwork and altering text rasterisation across the
+   entire site, even while the canvas itself is empty. The particles are
+   painted normally instead. */
 .cursor-fx {
   position: fixed; inset: 0;
   z-index: 9500;
   pointer-events: none;
-  mix-blend-mode: screen;
 }
 
 /* Page transition curtain.
@@ -541,6 +544,7 @@ body.menu-open .menu__link {
   line-height: 0.88;
   text-transform: uppercase;
   letter-spacing: -0.015em;
+  color: #fff;   /* match the caption exactly, not the warmer --ink */
 }
 
 /* ---- the artwork stage ---- */
@@ -614,7 +618,17 @@ body.menu-open .menu__link {
 
 .hero__meta { display: grid; gap: 0.15rem; min-width: 0; }
 .hero__meta .k { font-size: var(--t-micro); letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
-.hero__meta .v { font-family: var(--font-display); font-size: var(--t-lg); text-transform: uppercase; letter-spacing: 0.01em; }
+/* Sized up from --t-lg. At ~30px Anton's stems are thin enough that
+   antialiasing blends most of the glyph into the black behind it, so the
+   same white reads noticeably greyer than the headline. Larger glyphs put
+   proportionally less of the letter on the antialiased edge. */
+.hero__meta .v {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.7vw, 2.3rem);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  color: #fff;
+}
 
 .hero__ctrl { display: flex; align-items: center; gap: 1.25rem; }
 .hero__dots { display: flex; gap: 0.7rem; }
@@ -1088,14 +1102,6 @@ body.menu-open .menu__link {
 .phero::after {
   content: ""; position: absolute; inset: auto 0 0 0; height: 1px; background: var(--line);
 }
-.phero__glow {
-  position: absolute; z-index: -1;
-  top: -30%; left: 50%; transform: translateX(-50%);
-  width: min(1100px, 120vw); aspect-ratio: 1;
-  background: radial-gradient(circle, rgba(255,107,18,0.16), transparent 62%);
-  filter: blur(18px);
-  pointer-events: none;
-}
 .phero__grid {
   display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
   gap: var(--s-5); align-items: end;
@@ -1279,12 +1285,6 @@ body.menu-open .menu__link {
   text-align: center;
   overflow: hidden;
   border-top: 1px solid var(--line);
-}
-.cta__glow {
-  position: absolute; left: 50%; top: 100%; transform: translate(-50%, -50%);
-  width: min(1200px, 140vw); aspect-ratio: 2 / 1;
-  background: radial-gradient(ellipse, rgba(255,107,18,0.22), transparent 65%);
-  pointer-events: none;
 }
 .cta__title {
   font-family: var(--font-display);
