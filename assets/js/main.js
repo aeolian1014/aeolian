@@ -741,6 +741,15 @@
     /* Size the cards. Re-run on resize because both the container width
        and the target row height are viewport-dependent. */
     function measure(items) {
+      try { measureInner(items); }
+      catch (err) {
+        // Never let a sizing failure abort paint(). The CSS fallback in
+        // .grid__rows already guarantees a usable grid.
+        console.error("grid measure failed:", err);
+      }
+    }
+
+    function measureInner(items) {
       const host = $(".grid__rows", root);
       if (!host) return;
       const cards = $$(".card", host);
@@ -757,16 +766,20 @@
       // Narrow screens: one full-width card per row, natural height.
       if (width < 620) {
         cards.forEach((c, i) => {
-          const ar = items[i].ar || 1.6;
+          const ar = (items[i] && items[i].ar) || 1.6;
+          c.style.flex = "1 1 100%";
           c.style.width = "100%";
           c.style.height = Math.round(width / ar) + "px";
         });
+        host.classList.add("is-sized");
         return;
       }
 
       const targetH = width < 1000 ? width * 0.34 : Math.min(width * 0.26, 380);
-      const ratios = items.map((w) => w.ar || 1.6);
+      const ratios = items.map((w) => (w && w.ar) || 1.6);
       const rows = justify(ratios, width, gap, targetH);
+      if (!rows.length) return;   // keep the CSS fallback rather than nothing
+      host.classList.add("is-sized");
 
       rows.forEach((row) => {
         for (let i = row.from; i <= row.to; i++) {
@@ -789,11 +802,18 @@
        broke the rows. */
     let measureRaf = 0;
     const remeasure = () => {
+      // Measure synchronously first: requestAnimationFrame is throttled in
+      // background tabs, and relying on it alone leaves the grid unsized.
+      measure(list);
       cancelAnimationFrame(measureRaf);
       measureRaf = requestAnimationFrame(() => measure(list));
     };
     new ResizeObserver(remeasure).observe(root);
     addEventListener("resize", remeasure);
+    // Webfonts and late layout can change the container after first paint.
+    addEventListener("load", remeasure);
+    setTimeout(remeasure, 300);
+    setTimeout(remeasure, 1200);
 
     function wireCards(scope, items) {
       $$(".card", scope).forEach((card) => {

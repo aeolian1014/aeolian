@@ -808,6 +808,15 @@ body.menu-open .menu__link {
   gap: clamp(0.9rem, 1.6vw, 1.6rem);
 }
 
+/* Fallback sizing. The card's images are absolutely positioned, so without
+   an explicit size a card collapses to its 1px borders and every image
+   stays unloaded — an invisible grid. These defaults give a perfectly
+   usable wrapped grid even if the JS solver never runs. `is-sized` is set
+   by measure() once real widths are applied, releasing the min-height so
+   solved row heights are free to be shorter. */
+.grid__rows .card { flex: 1 1 320px; min-height: 240px; }
+.grid__rows.is-sized .card { min-height: 0; }
+
 /* The card is a <button> built from spans, so the block-level
    display values have to be declared rather than inherited. */
 .card {
