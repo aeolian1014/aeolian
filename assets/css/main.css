@@ -84,6 +84,10 @@ html {
   background: var(--bg);
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* Reserve the scrollbar gutter always. The justified grid solves card
+     widths from the container width; if the scrollbar appears afterwards
+     the container narrows and every row overflows and wraps. */
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -877,13 +881,18 @@ body.menu-open .menu__link {
 .card.is-loaded .card__media::before { opacity: 0; animation: none; }
 @keyframes shimmer { to { background-position: -220% 0; } }
 
+/* Kept tight to the bottom edge. Its only job is to make the caption
+   legible — it must not dim the artwork. The old gradient reached 70% up
+   the card, which was tolerable on tall cards but swallowed square ones
+   whole, especially dark pieces like the Chanel ad. It now clears by 38%
+   and is fully transparent above that. */
 .card__veil {
   position: absolute; inset: 0; z-index: 3; pointer-events: none;
-  background: linear-gradient(to top, rgba(8,8,10,0.92) 0%, rgba(8,8,10,0.25) 42%, rgba(8,8,10,0) 70%);
-  opacity: 0.75;
-  transition: opacity var(--dur-3) var(--ease-out);
+  background: linear-gradient(to top,
+    rgba(8, 8, 10, 0.90) 0%,
+    rgba(8, 8, 10, 0.45) 16%,
+    rgba(8, 8, 10, 0) 38%);
 }
-.card:hover .card__veil { opacity: 1; }
 
 .card__body {
   position: absolute; inset: auto 0 0 0; z-index: 4;
@@ -891,6 +900,10 @@ body.menu-open .menu__link {
   display: grid; gap: 0.35rem;
   transform: translateY(0);
   transition: transform var(--dur-3) var(--ease-out);
+  /* Legibility comes from a halo behind the glyphs, not from darkening
+     the picture. Keeps the caption readable over a bright image while
+     the artwork itself stays untouched. */
+  text-shadow: 0 1px 3px rgba(8, 8, 10, 0.85), 0 2px 14px rgba(8, 8, 10, 0.75);
 }
 .card:hover .card__body { transform: translateY(-4px); }
 

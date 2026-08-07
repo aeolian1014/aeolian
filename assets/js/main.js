@@ -748,8 +748,11 @@
 
       const cs = getComputedStyle(host);
       const gap = parseFloat(cs.gap) || 0;
-      const width = host.clientWidth;
-      if (!width) return;
+      // Solve 1px narrow. Sub-pixel rounding in the solved widths would
+      // otherwise push a row a fraction over the container and flexbox
+      // would wrap it, stranding cards on their own lines.
+      const width = host.clientWidth - 1;
+      if (width <= 0) return;
 
       // Narrow screens: one full-width card per row, natural height.
       if (width < 620) {
@@ -769,20 +772,28 @@
         for (let i = row.from; i <= row.to; i++) {
           const card = cards[i];
           if (!card) continue;
-          card.style.height = Math.round(row.h) + "px";
-          // flex-basis carries the width; grow/shrink off so the solved
-          // widths are honoured exactly and the row stays flush.
-          card.style.flex = `0 0 ${(ratios[i] * row.h).toFixed(2)}px`;
+          card.style.height = row.h.toFixed(2) + "px";
+          const w = (ratios[i] * row.h).toFixed(2);
+          // flex-basis carries the solved width. The last card in a row
+          // may grow, absorbing the 1px guard above so the row still ends
+          // flush against the right edge.
+          card.style.flex = i === row.to ? `1 1 ${w}px` : `0 0 ${w}px`;
           card.style.width = "";
         }
       });
     }
 
-    let resizeRaf = 0;
-    addEventListener("resize", () => {
-      cancelAnimationFrame(resizeRaf);
-      resizeRaf = requestAnimationFrame(() => measure(list));
-    });
+    /* Re-solve whenever the container's width actually changes — not just
+       on window resize. The scrollbar appearing after first paint narrows
+       the container without firing a resize event, which is exactly what
+       broke the rows. */
+    let measureRaf = 0;
+    const remeasure = () => {
+      cancelAnimationFrame(measureRaf);
+      measureRaf = requestAnimationFrame(() => measure(list));
+    };
+    new ResizeObserver(remeasure).observe(root);
+    addEventListener("resize", remeasure);
 
     function wireCards(scope, items) {
       $$(".card", scope).forEach((card) => {
