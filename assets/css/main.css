@@ -917,11 +917,15 @@ body.menu-open .menu__link {
 .card:hover .card__body { transform: translateY(-4px); }
 
 .card__cat {
+  opacity: 0;
+  transition: opacity var(--dur-2) var(--ease-out);
   display: block;
   font-size: var(--t-micro); font-weight: 600;
   letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--accent);
 }
+.card:hover .card__cat,
+.card:focus-visible .card__cat { opacity: 1; }
 .card__title {
   display: block;
   font-family: var(--font-display);

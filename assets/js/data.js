@@ -12,6 +12,7 @@ window.RS = window.RS || {};
 
 RS.categories = [
   { id: "all",           label: "All Work" },
+  { id: "movie-posters", label: "Movie Posters" },
   { id: "banners",       label: "Banners & Thumbnails" },
   { id: "logos",         label: "Logos & Identity" },
   { id: "ads",           label: "Advertising" },
@@ -29,6 +30,148 @@ RS.categories = [
    Card widths are NOT set here — main.js packs each grid row to exactly
    12 columns, so the mosaic stays flush at any item count or filter. */
 RS.works = [
+  {
+    "id": "monster-energy-zeus",
+    "ar": 1.3333333333333333,
+    "title": "Monster Energy Zeus",
+    "client": "Portfolio work",
+    "cat": "product",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/product/monster-energy-zeus.jpg",
+    "thumb": "Media/web/product/monster-energy-zeus-thumb.jpg",
+    "blurb": "Monster Energy Zeus product visual."
+  },
+  /* Newly added work. addedAt controls newest-first order across pages. */
+  {
+    "id": "alien-romulus",
+    "ar": 0.6666666666666666,
+    "title": "Alien Romulus",
+    "client": "Fan work",
+    "cat": "movie-posters",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/movie-posters/alien-romulus.jpg",
+    "blurb": "Movie fan poster for Alien Romulus.",
+    "thumb": "Media/web/movie-posters/alien-romulus-thumb.jpg"
+  },
+  {
+    "id": "dune-3",
+    "ar": 0.6666666666666666,
+    "title": "Dune 3",
+    "client": "Fan work",
+    "cat": "movie-posters",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/movie-posters/dune-3.jpg",
+    "blurb": "Movie fan poster for Dune 3.",
+    "thumb": "Media/web/movie-posters/dune-3-thumb.jpg"
+  },
+  {
+    "id": "predator-badlands",
+    "ar": 0.6666666666666666,
+    "title": "Predator Badlands",
+    "client": "Fan work",
+    "cat": "movie-posters",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/movie-posters/predator-badlands.jpg",
+    "blurb": "Movie fan poster for Predator Badlands.",
+    "thumb": "Media/web/movie-posters/predator-badlands-thumb.jpg"
+  },
+  {
+    "id": "byd-song-plus",
+    "ar": 0.6666666666666666,
+    "title": "BYD Song Plus",
+    "client": "Portfolio work",
+    "cat": "product",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/product/byd-song-plus.jpg",
+    "blurb": "Automotive visual featuring the BYD Song Plus.",
+    "thumb": "Media/web/product/byd-song-plus-thumb.jpg"
+  },
+  {
+    "id": "coca-cola",
+    "ar": 0.6666666666666666,
+    "title": "Coca Cola",
+    "client": "Portfolio work",
+    "cat": "product",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/product/coca-cola.jpg",
+    "blurb": "Coca Cola product visual.",
+    "thumb": "Media/web/product/coca-cola-thumb.jpg"
+  },
+  {
+    "id": "coca-cola-v0",
+    "ar": 0.6666666666666666,
+    "title": "Coca Cola — v0",
+    "client": "Portfolio work",
+    "cat": "product",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/product/coca-cola-v0.jpg",
+    "blurb": "Alternate Coca Cola product visual.",
+    "thumb": "Media/web/product/coca-cola-v0-thumb.jpg"
+  },
+  {
+    "id": "kia-k5",
+    "ar": 0.6666666666666666,
+    "title": "Kia K5",
+    "client": "Portfolio work",
+    "cat": "product",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/product/kia-k5.jpg",
+    "blurb": "Automotive visual featuring the Kia K5.",
+    "thumb": "Media/web/product/kia-k5-thumb.jpg"
+  },
+  {
+    "id": "pepsi-co",
+    "ar": 0.6666666666666666,
+    "title": "Pepsi Co",
+    "client": "Portfolio work",
+    "cat": "product",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "image",
+    "src": "Media/web/product/pepsi-co.jpg",
+    "blurb": "Pepsi product visual.",
+    "thumb": "Media/web/product/pepsi-co-thumb.jpg"
+  },
+  {
+    "id": "women-smartwatch",
+    "ar": 0.5625,
+    "title": "Women Smartwatch",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-09-25",
+    "tools": [],
+    "type": "video",
+    "src": "Media/web/animations/women-smartwatch.mp4",
+    "blurb": "Smartwatch product animation.",
+    "poster": "Media/web/animations/women-smartwatch-poster.jpg"
+  },
+
   /* ---------------- BANNERS & THUMBNAILS ---------------- */
   {
     id: "nematov-ai-v1-2", ar: 1.7787, title: "Nematov AI", client: "Nematov AI", cat: "banners", year: "2025",
@@ -262,16 +405,47 @@ RS.works = [
   },
 ];
 
-/* Hero showcase — the frames the WebGL stage melts between.
-   These must be WIDE (16:9). The stage renders them *contained*, never
-   cropped, so each piece is shown whole with its own typography intact —
-   the site's headline sits beside the stage, never on top of it. */
-RS.hero = [
-  { src: "Media/web/banners/nematov-ai-v1-2.jpg",  label: "Nematov AI",    kicker: "Channel Identity" },
-  { src: "Media/web/ads/monster-energy-wide.jpg",  label: "Monster Energy", kicker: "Advertising" },
-  { src: "Media/web/banners/speedscope.jpg",       label: "SpeedScope",    kicker: "Channel Design" },
-  { src: "Media/web/banners/wolfgang2.jpg",        label: "WolfGang",      kicker: "Gaming Brand" },
-];
+/* Sort once for every page and category filter. ISO addedAt dates take
+   precedence; older entries fall back to their project year. Equal dates
+   retain their authored order. Add addedAt: "YYYY-MM-DD" to each new work. */
+RS.newestWorks = function (works = RS.works) {
+  const date = (w) => {
+    const parsed = Date.parse(w.addedAt || `${w.year}-01-01`);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  return [...works].sort((a, b) => date(b) - date(a));
+};
+RS.works = RS.newestWorks();
+
+/* Keep the original carousel until a newly added image is clean 16:9.
+   ar is source width / height. The tiny tolerance only accommodates
+   four-decimal metadata (1.7778); other formats cannot replace a slide. */
+RS.buildHero = function (works = RS.works) {
+  const defaults = [
+    { id: "nematov-ai-v1-2", label: "Nematov AI", kicker: "Channel Identity" },
+    { id: "monster-energy-wide", label: "Monster Energy", kicker: "Advertising" },
+    { id: "speedscope", label: "SpeedScope", kicker: "Channel Design" },
+    { id: "wolfgang2", label: "WolfGang", kicker: "Gaming Brand" },
+  ];
+  const replacements = RS.newestWorks(works).filter((w) =>
+    w.type === "image" &&
+    Number.isFinite(Date.parse(w.addedAt)) &&
+    Number.isFinite(w.ar) && Math.abs(w.ar - 16 / 9) <= 0.00005 &&
+    !defaults.some((slide) => slide.id === w.id)
+  ).slice(0, defaults.length);
+
+  return defaults.map((slide, index) => {
+    const replacement = replacements[index];
+    if (replacement) return {
+      src: replacement.src,
+      label: replacement.title,
+      kicker: RS.categories.find((c) => c.id === replacement.cat)?.label || "Latest Work",
+    };
+    const original = works.find((w) => w.id === slide.id);
+    return { src: original.src, label: slide.label, kicker: slide.kicker };
+  });
+};
+RS.hero = RS.buildHero();
 
 /* Capability pillars used on the home + about pages. */
 RS.services = [

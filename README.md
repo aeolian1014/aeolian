@@ -17,7 +17,7 @@ Then open <http://localhost:8322>.
 
 ```
 index.html          Home — WebGL hero, featured work, capabilities
-work.html           All 36 projects, filterable, with lightbox
+work.html           All projects, filterable, with lightbox
 about.html          Bio, skills, timeline
 contact.html        Form, details, FAQ
 robots.txt
@@ -44,6 +44,7 @@ drop an object into `RS.works` — no HTML to edit:
   client: "Client name",
   cat: "banners",                  // must match an id in RS.categories
   year: "2026",
+  addedAt: "2026-09-25",           // date added; newest dates appear first
   tools: ["Photoshop"],
   type: "image",                   // "image" or "video"
   src:   "Media/web/banners/my-new-piece.jpg",
@@ -52,9 +53,9 @@ drop an object into `RS.works` — no HTML to edit:
 }
 ```
 
-You don't set card widths. `layoutSpans()` in `main.js` packs every grid row
-to exactly 12 columns, so the mosaic stays flush no matter how many items a
-filter returns.
+New work is sorted by `addedAt` (ISO `YYYY-MM-DD`) descending on every page and within category filters. Older entries without that field fall back to their project year; matching dates retain their order in the content file. The home page shows at least the newest nine projects, expanding to include every project sharing the latest addition date, while the four-slide hero only accepts new 16:9 images. Add each future design to `RS.works` with its actual addition date to feature it automatically.
+
+Card sizes are calculated from each artwork's `ar` aspect ratio by the justified layout in `main.js`, preserving the full artwork.
 
 For a video use `type: "video"` with `src` (`.mp4`) and `poster` (`.jpg`)
 instead of `thumb`. Set `light: true` on a transparent PNG that needs a light
@@ -83,11 +84,7 @@ ffmpeg -y -ss 0.5 -i input.mp4 -frames:v 1 -vf "scale='min(1280,iw)':-2" -q:v 4 
 
 ## Changing the hero slideshow
 
-`RS.hero` in `data.js` drives the stage on the home page. **Use wide (16:9)
-pieces there.** The stage renders each one *contained* — never cropped —
-because every piece in this portfolio carries its own headline type, and
-cropping it mid-word looks broken. That's also why the site's own headline
-sits beside the stage rather than on top of it.
+`RS.buildHero()` preserves the original four slides (Nematov AI, Monster Energy, SpeedScope, WolfGang). A newly added image with a valid `addedAt` date and a clean 16:9 `ar` replaces one slot, newest first. Each eligible image replaces one original slide; remaining originals stay in their slots. At most four replacements are used. Portrait, square, 4:3, missing-ratio entries and videos cannot replace slides. Set `ar` to the source width divided by height; the comparison permits only four-decimal rounding (1.7778), not approximate widescreen formats. Gallery ordering is independent of hero eligibility.
 
 ## Rolling back the page transition
 

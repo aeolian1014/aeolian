@@ -698,7 +698,7 @@
           <span class="card__title">${esc(w.title)}</span>
           <span class="card__meta">
             <span>${esc(w.client)}</span><i>/</i><span>${esc(w.year)}</span>
-            <i>/</i><span>${esc(w.tools.join(", "))}</span>
+            ${w.tools.length ? `<i>/</i><span>${esc(w.tools.join(", "))}</span>` : ""}
           </span>
         </span>
       </button>`;

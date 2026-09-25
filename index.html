@@ -12,7 +12,7 @@
   <meta property="og:type" content="website">
   <meta property="og:title" content="Sulaymon Ruziboev — Graphic &amp; Motion Designer">
   <meta property="og:description" content="Brand identity, content design, advertising and motion — built for creators and small brands.">
-  <meta property="og:image" content="Media/web/banners/nematov-ai-v1-2.jpg">
+  <meta property="og:image" content="Media/web/product/monster-energy-zeus.jpg">
   <meta name="twitter:card" content="summary_large_image">
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
@@ -174,7 +174,7 @@
           </div>
           <div class="shead__r">
             <p class="lead" data-reveal style="--d:.1s">
-              A cross-section — identity, content design, product visuals and motion.
+              The latest additions — movie posters, product visuals and motion.
               Hover a motion piece to play it; click anything to open it full size.
             </p>
             <a href="work.html" class="btn" data-magnetic data-reveal style="--d:.2s">
@@ -242,12 +242,11 @@
     RS.page = function (ctx) {
       const { $, esc, initGrid, observeReveals } = ctx;
 
-      /* Featured: one strong piece per discipline. */
-      const picks = ["nematov-ai-v1-2", "z-fold-7-v1", "project-10-after-effects",
-                     "chanel", "speedscope", "phoenix-security-logo-concept"];
-      const featured = picks
-        .map((id) => RS.works.find((w) => w.id === id))
-        .filter(Boolean);
+      /* New additions automatically lead the home-page selection. */
+      const latestDate = RS.works[0]?.addedAt;
+      const latestCount = latestDate
+        ? RS.works.filter((w) => w.addedAt === latestDate).length : 0;
+      const featured = RS.works.slice(0, Math.max(9, latestCount));
       initGrid($("[data-featured-grid]"), featured);
 
       /* Services list. */
