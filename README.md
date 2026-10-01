@@ -114,3 +114,7 @@ ever intercepts clicks, it never owns them.
 - Three.js loads from a CDN. If you'd rather not depend on one, download
   `three.module.js` into `assets/js/vendor/` and change the import at the top
   of `hero-gl.js`.
+
+## October 2026 animation imports
+
+The 13 new animation originals remain in `Media/web/animations/`. The site uses separate H.264 MP4 copies in `Media/web/animations/optimized/`, encoded with the slow preset, CRF 23, a maximum 1280px long edge, yuv420p, fast-start metadata and 128 kbps AAC audio. Hover previews stay muted; the project viewer enables sound with native volume controls. JPEG posters load before videos; the existing runtime only assigns preview video sources on hover. These are lossy web derivatives; original files remain available at full quality.

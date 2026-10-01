@@ -912,7 +912,7 @@
       el.classList.toggle("is-light", !!w.light);
 
       frame.innerHTML = w.type === "video"
-        ? `<video src="${url(w.src)}" poster="${url(w.poster)}" controls autoplay loop muted playsinline></video>`
+        ? `<video src="${url(w.src)}" poster="${url(w.poster)}" controls autoplay loop playsinline></video>`
         : `<img src="${url(w.src)}" alt="${esc(w.title)}">`;
 
       const media = frame.firstElementChild;
