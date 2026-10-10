@@ -61,8 +61,8 @@
             </button>
 
             <a href="index.html" class="nav__logo" aria-label="Sulaymon Ruziboev — home">
-              <img src="${url("Media/Logos/SULAYMON PROFILE PIC PNG.png")}"
-                   alt="Sulaymon Ruziboev" width="120" height="120">
+              <img src="${url("Media/web/logo/profile-440.webp")}"
+                   alt="Sulaymon Ruziboev" width="440" height="121" decoding="async">
             </a>
 
             <div class="nav__right">
@@ -132,8 +132,8 @@
         <div class="wrap">
           <div class="footer__top">
             <div class="footer__brand">
-              <img src="${url("Media/Logos/SULAYMON PROFILE PIC PNG.png")}"
-                   alt="Sulaymon Ruziboev" width="120" height="120" loading="lazy">
+              <img src="${url("Media/web/logo/profile-440.webp")}"
+                   alt="Sulaymon Ruziboev" width="440" height="121" loading="lazy" decoding="async">
               <p>Graphic &amp; motion designer building brand identities, content design and
                  animation for creators and small brands.</p>
               <p class="avail"><i aria-hidden="true"></i>Available for new projects</p>
@@ -155,7 +155,7 @@
               <div class="social-row" style="margin-top:.6rem">
                 ${c.socials.map((s) => `
                   <a class="social" href="${esc(s.href)}" target="_blank" rel="noopener">
-                    <img src="${url(s.icon)}" alt="" aria-hidden="true" width="16" height="16" loading="lazy">
+                    <img src="${url(s.icon)}" alt="" aria-hidden="true" width="16" height="16" loading="lazy" decoding="async">
                     ${esc(s.name)}
                   </a>`).join("")}
               </div>
@@ -912,7 +912,7 @@
       el.classList.toggle("is-light", !!w.light);
 
       frame.innerHTML = w.type === "video"
-        ? `<video src="${url(w.src)}" poster="${url(w.poster)}" controls autoplay loop playsinline></video>`
+        ? `<video src="${url(w.src)}" poster="${url(w.poster)}" controls autoplay loop playsinline preload="metadata"></video>`
         : `<img src="${url(w.src)}" alt="${esc(w.title)}">`;
 
       const media = frame.firstElementChild;
@@ -971,11 +971,20 @@
 
     const canvas = $(".hero__canvas", hero);
     const fallback = $(".hero__fallback", hero);
-    const dots = $$(".hero__dot", hero);
     const toggle = $(".hero__toggle", hero);
     const kicker = $("[data-hero-kicker]", hero);
     const label = $("[data-hero-label]", hero);
     const slides = RS.hero;
+
+    /* One dot per slide — the slide count follows the content file. */
+    const dotHost = $(".hero__dots", hero);
+    if (dotHost) dotHost.innerHTML = slides.map((s, n) =>
+      `<button class="hero__dot${n ? "" : " is-active"}" type="button" aria-label="Show slide ${n + 1}"></button>`
+    ).join("");
+    const dots = $$(".hero__dot", hero);
+
+    /* Video slides hold longer than stills so the motion can be seen. */
+    const holdFor = (n) => (slides[n].video && !REDUCED ? 12000 : 5600);
 
     let i = 0, timer = null, paused = REDUCED;
     let gl = null;
@@ -984,6 +993,7 @@
       if (kicker) kicker.textContent = slides[i].kicker;
       if (label) label.textContent = slides[i].label;
       dots.forEach((d, n) => {
+        d.style.setProperty("--hold", `${holdFor(n) / 1000}s`);
         d.classList.toggle("is-active", n === i);
         d.classList.toggle("is-paused", paused);
       });
@@ -1003,9 +1013,9 @@
     function start() {
       stop();
       if (paused) return;
-      timer = setInterval(() => go(i + 1), 5600);
+      timer = setTimeout(() => { go(i + 1); start(); }, holdFor(i));
     }
-    function stop() { if (timer) { clearInterval(timer); timer = null; } }
+    function stop() { if (timer) { clearTimeout(timer); timer = null; } }
 
     dots.forEach((d, n) =>
       d.addEventListener("click", () => { go(n); if (!paused) start(); })
@@ -1034,7 +1044,9 @@
     /* WebGL layer boots when the module has registered its factory. */
     RS._bootHeroGL = () => {
       if (!RS.createHeroGL || !canvas) return;
-      gl = RS.createHeroGL(canvas, slides.map((s) => url(s.src)), {
+      gl = RS.createHeroGL(canvas, slides.map((s) => ({
+        src: url(s.src), video: s.video ? url(s.video) : null, posterAt: s.posterAt || 0,
+      })), {
         onProgress: (p) => RS.preloader?.set(0.2 + p * 0.6),
         onReady: () => {
           hero.classList.add("gl-ready");

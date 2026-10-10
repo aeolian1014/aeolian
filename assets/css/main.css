@@ -634,10 +634,11 @@ body.menu-open .menu__link {
   color: #fff;
 }
 
-.hero__ctrl { display: flex; align-items: center; gap: 1.25rem; }
-.hero__dots { display: flex; gap: 0.7rem; }
+.hero__ctrl { display: flex; align-items: center; gap: 1.25rem; min-width: 0; max-width: 100%; }
+/* The slide count follows the content, so dots shrink to fit a phone. */
+.hero__dots { display: flex; gap: 0.7rem; min-width: 0; }
 .hero__dot {
-  width: 46px; height: 2px; background: var(--ink-4);
+  flex: 0 1 46px; min-width: 14px; height: 2px; background: var(--ink-4);
   position: relative; overflow: hidden; cursor: pointer;
 }
 .hero__dot::after {
@@ -645,7 +646,7 @@ body.menu-open .menu__link {
   transition: right 0.3s var(--ease-out);
 }
 .hero__dot:hover::after { right: 60%; }
-.hero__dot.is-active::after { right: 0; transition: right 5.6s linear; }
+.hero__dot.is-active::after { right: 0; transition: right var(--hold, 5.6s) linear; }
 .hero__dot.is-active.is-paused::after { transition: none; }
 
 /* Hexagon, not a circle — carries over the shape language from the

@@ -202,7 +202,7 @@
       if (socials) {
         socials.innerHTML = c.socials.map((s) => `
           <a class="social" href="${esc(s.href)}" target="_blank" rel="noopener">
-            <img src="${url(s.icon)}" alt="" aria-hidden="true" width="16" height="16">
+            <img src="${url(s.icon)}" alt="" aria-hidden="true" width="16" height="16" loading="lazy" decoding="async">
             ${esc(s.name)}
           </a>`).join("");
       }

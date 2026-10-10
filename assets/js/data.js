@@ -30,6 +30,82 @@ RS.categories = [
    Card widths are NOT set here — main.js packs each grid row to exactly
    12 columns, so the mosaic stays flush at any item count or filter. */
 RS.works = [
+  /* October 10 2026 additions — 16:9 promos; these lead the home hero. */
+  {
+    "id": "revuelto-sv-phonk-edit",
+    "ar": 1.7778,
+    "title": "Lamborghini Revuelto SV — Phonk Edit",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-10",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/revuelto-sv-phonk-edit.mp4",
+    "poster": "Media/web/animations/optimized/revuelto-sv-phonk-edit-poster.jpg",
+    "posterAt": 1,
+    "blurb": "Automotive edit cut to a phonk track — hard cuts on the beat, low angles and a studio-lit hero car."
+  },
+  {
+    "id": "monster-energy-full-throttle",
+    "ar": 1.7778,
+    "title": "Monster Energy — Full Throttle",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-10",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/monster-energy-full-throttle.mp4",
+    "poster": "Media/web/animations/optimized/monster-energy-full-throttle-poster.jpg",
+    "posterAt": 3,
+    "blurb": "Promo spot for Monster Energy: a hero can wrapped in green smoke, then drift footage and punchy kinetic type."
+  },
+  {
+    "id": "click-superapp-promo",
+    "ar": 1.7778,
+    "title": "Click SuperApp Promo",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-10",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/click-superapp-promo.mp4",
+    "poster": "Media/web/animations/optimized/click-superapp-promo-poster.jpg",
+    "posterAt": 6,
+    "blurb": "Product promo for the Click super-app — floating UI cards and bold Uzbek type explain the app in seconds."
+  },
+  {
+    "id": "yandex-uz-promo",
+    "ar": 1.7778,
+    "title": "Yandex Uz Promo",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-10",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/yandex-uz-promo.mp4",
+    "poster": "Media/web/animations/optimized/yandex-uz-promo-poster.jpg",
+    "posterAt": 6,
+    "blurb": "Promo for Yandex in Uzbekistan — search, maps and taxi shown as everyday questions with animated UI cards."
+  },
+  {
+    "id": "my-shartnoma-promo",
+    "ar": 1.7778,
+    "title": "My Shartnoma Promo",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-10",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/my-shartnoma-promo.mp4",
+    "poster": "Media/web/animations/optimized/my-shartnoma-promo-poster.jpg",
+    "posterAt": 6,
+    "blurb": "Explainer promo for the My Shartnoma contracts app — a relatable office story told with clean motion type."
+  },
   /* October 2026 additions — lightweight web copies; originals preserved. */
   {
     "id": "asus-rog-strix",
@@ -614,9 +690,11 @@ RS.newestWorks = function (works = RS.works) {
 };
 RS.works = RS.newestWorks();
 
-/* Keep the original carousel until a newly added image is clean 16:9.
+/* Keep the original carousel until newly added work is clean 16:9.
    ar is source width / height. The tiny tolerance only accommodates
-   four-decimal metadata (1.7778); other formats cannot replace a slide. */
+   four-decimal metadata (1.7778); other formats cannot replace a slide.
+   Images and videos both qualify. Each one replaces an original slide,
+   newest first; past four, extra 16:9 additions add slides (max 8). */
 RS.buildHero = function (works = RS.works) {
   const defaults = [
     { id: "nematov-ai-v1-2", label: "Nematov AI", kicker: "Channel Identity" },
@@ -624,22 +702,27 @@ RS.buildHero = function (works = RS.works) {
     { id: "speedscope", label: "SpeedScope", kicker: "Channel Design" },
     { id: "wolfgang2", label: "WolfGang", kicker: "Gaming Brand" },
   ];
+  const MAX = 8;
   const replacements = RS.newestWorks(works).filter((w) =>
-    w.type === "image" &&
+    (w.type === "image" || w.type === "video") &&
     Number.isFinite(Date.parse(w.addedAt)) &&
     Number.isFinite(w.ar) && Math.abs(w.ar - 16 / 9) <= 0.00005 &&
     !defaults.some((slide) => slide.id === w.id)
-  ).slice(0, defaults.length);
+  ).slice(0, MAX);
 
-  return defaults.map((slide, index) => {
+  const count = Math.max(defaults.length, replacements.length);
+  return Array.from({ length: count }, (_, index) => {
     const replacement = replacements[index];
     if (replacement) return {
-      src: replacement.src,
+      src: replacement.type === "video" ? replacement.poster : replacement.src,
+      video: replacement.type === "video" ? replacement.src : null,
+      posterAt: replacement.posterAt || 0,
       label: replacement.title,
       kicker: RS.categories.find((c) => c.id === replacement.cat)?.label || "Latest Work",
     };
+    const slide = defaults[index];
     const original = works.find((w) => w.id === slide.id);
-    return { src: original.src, label: slide.label, kicker: slide.kicker };
+    return { src: original.src, video: null, posterAt: 0, label: slide.label, kicker: slide.kicker };
   });
 };
 RS.hero = RS.buildHero();

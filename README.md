@@ -118,3 +118,7 @@ ever intercepts clicks, it never owns them.
 ## October 2026 animation imports
 
 The 13 new animation originals remain in `Media/web/animations/`. The site uses separate H.264 MP4 copies in `Media/web/animations/optimized/`, encoded with the slow preset, CRF 23, a maximum 1280px long edge, yuv420p, fast-start metadata and 128 kbps AAC audio. Hover previews stay muted; the project viewer enables sound with native volume controls. JPEG posters load before videos; the existing runtime only assigns preview video sources on hover. These are lossy web derivatives; original files remain available at full quality.
+
+## October 10 2026 additions
+
+Five 16:9 promos (Revuelto SV Phonk Edit, Monster Energy — Full Throttle, Click SuperApp, Yandex Uz, My Shartnoma) were added to `Media/web/animations/optimized/` at 1280px, 30 fps, CRF 24–26, 128 kbps AAC. The hero now accepts 16:9 **videos** as well as images, holds video slides for 12 s, and grows past four slides when there are more (max 8; dots are generated). A hero video's src is only attached when its slide is shown, starting at its `posterAt` second so it continues from the poster frame. The header/footer logo and the About portrait use light WebP copies in `Media/web/logo/`; every image except the looping tools strip loads lazily.

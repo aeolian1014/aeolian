@@ -9,6 +9,11 @@
    reads as a broken render rather than as craft. Pixels are sampled 1:1
    from the source and only blended by opacity.
 
+   Video slides: the poster is the texture until the slide is shown.
+   Only then is the video's src attached (lazy), seeked to the poster
+   frame and played muted; once it is actually playing it takes over as
+   a VideoTexture. Hidden slides and an off-screen hero pause their video.
+
    Degrades on purpose: if WebGL is unavailable, the module never marks
    the hero `gl-ready`, so the CSS fallback stays visible.
    ===================================================================== */
@@ -68,6 +73,7 @@ const FRAG = /* glsl */ `
   }
 `;
 
+/* sources: [{ src, video?, posterAt? }] — src is an image (or poster). */
 function createHeroGL(canvas, sources, hooks = {}) {
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -138,6 +144,55 @@ function createHeroGL(canvas, sources, hooks = {}) {
     );
   });
 
+  /* ---------- video slides ---------- */
+  const videos = [];      // index -> { el, tex, live }
+  let visible = true;
+
+  const texFor = (i) => (videos[i]?.live ? videos[i].tex : textures[i]);
+  const sizeFor = (i) => (videos[i]?.live ? videos[i].size : sizes[i]);
+
+  function playVideo(i) {
+    const s = sources[i];
+    if (!s?.video || reduced) return;
+    let v = videos[i];
+    if (!v) {
+      const el = document.createElement("video");
+      el.muted = true; el.loop = true; el.playsInline = true;
+      el.setAttribute("playsinline", ""); el.setAttribute("muted", "");
+      el.preload = "auto";
+      el.crossOrigin = "anonymous";
+      v = videos[i] = { el, tex: null, live: false, size: new THREE.Vector2(1, 1) };
+      el.addEventListener("loadedmetadata", () => {
+        v.size.set(el.videoWidth || 1, el.videoHeight || 1);
+        if (s.posterAt && s.posterAt < el.duration) el.currentTime = s.posterAt;
+      }, { once: true });
+      el.addEventListener("playing", () => {
+        if (v.live) return;
+        const tex = new THREE.VideoTexture(el);
+        tex.colorSpace = THREE.NoColorSpace;
+        tex.minFilter = THREE.LinearFilter;
+        tex.magFilter = THREE.LinearFilter;
+        tex.generateMipmaps = false;
+        v.tex = tex; v.live = true;
+        // Swap the poster for the moving picture in whichever slot shows it.
+        const inA = animating ? from === i : current === i;
+        const inB = animating ? to === i : current === i;
+        if (inA) { uniforms.uTexA.value = tex; uniforms.uSizeA.value.copy(v.size); }
+        if (inB) { uniforms.uTexB.value = tex; uniforms.uSizeB.value.copy(v.size); }
+      });
+      el.src = s.video;   // attached only now — never before the slide shows
+    }
+    if (visible && !document.hidden) el_play(v.el);
+  }
+  const el_play = (el) => { const p = el.play(); if (p && p.catch) p.catch(() => {}); };
+
+  function pauseVideo(i) { videos[i]?.el.pause(); }
+
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) pauseVideo(current);
+    else if (visible) playVideo(current);
+  });
+
   /* ---------- transition state ---------- */
   let current = 0;
   let from = 0, to = 0;
@@ -149,14 +204,15 @@ function createHeroGL(canvas, sources, hooks = {}) {
     index = ((index % textures.length) + textures.length) % textures.length;
     if (index === current || animating) return;
     from = current; to = index;
-    uniforms.uTexA.value = textures[from];
-    uniforms.uTexB.value = textures[to];
-    uniforms.uSizeA.value.copy(sizes[from]);
-    uniforms.uSizeB.value.copy(sizes[to]);
+    uniforms.uTexA.value = texFor(from);
+    uniforms.uTexB.value = texFor(to);
+    uniforms.uSizeA.value.copy(sizeFor(from));
+    uniforms.uSizeB.value.copy(sizeFor(to));
     uniforms.uProgress.value = 0;
     tStart = clock.getElapsedTime();
     animating = true;
     current = index;
+    playVideo(to);
     if (reduced) { uniforms.uProgress.value = 1; animating = false; render(); }
   }
 
@@ -183,7 +239,6 @@ function createHeroGL(canvas, sources, hooks = {}) {
   /* ---------- loop ---------- */
   const clock = new THREE.Clock();
   let rafId = 0;
-  let visible = true;
 
   function render() { renderer.render(scene, camera); }
 
@@ -191,11 +246,11 @@ function createHeroGL(canvas, sources, hooks = {}) {
     rafId = requestAnimationFrame(tick);
     if (!visible) return;
 
-    // Nothing animates at rest now, so only redraw when the crossfade is
-    // running or the canvas actually changed size.
+    // At rest, only redraw when a video is playing (its texture needs a
+    // fresh frame), the crossfade is running, or the canvas resized.
     const resized = resize();
     if (!animating) {
-      if (resized) render();
+      if (resized || videos[current]?.live) render();
       return;
     }
 
@@ -204,24 +259,35 @@ function createHeroGL(canvas, sources, hooks = {}) {
     uniforms.uProgress.value = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
     if (p >= 1) {
       animating = false;
-      uniforms.uTexA.value = textures[to];
-      uniforms.uSizeA.value.copy(sizes[to]);
+      if (from !== to) pauseVideo(from);
+      uniforms.uTexA.value = texFor(to);
+      uniforms.uSizeA.value.copy(sizeFor(to));
+      uniforms.uTexB.value = texFor(to);
+      uniforms.uSizeB.value.copy(sizeFor(to));
       uniforms.uProgress.value = 0;
     }
     render();
   }
 
-  const io = new IntersectionObserver(([e]) => { visible = e.isIntersecting; }, { threshold: 0 });
+  // Read the LAST entry: one batch can hold an early "not intersecting"
+  // (canvas laid out mid-intro) followed by the real state.
+  const io = new IntersectionObserver((entries) => {
+    visible = entries[entries.length - 1].isIntersecting;
+    if (!ready) return;
+    visible ? playVideo(current) : pauseVideo(current);
+  }, { threshold: 0 });
   io.observe(canvas);
 
   /* ---------- boot ---------- */
   const sizes = [];
   let ready = false;
 
-  Promise.all(sources.map(loadOne)).then((loaded) => {
+  Promise.all(sources.map((s) => loadOne(s.src))).then((loaded) => {
     const ok = loaded.filter(Boolean);
     if (!ok.length) return; // keep the CSS fallback
-    ok.forEach((tex) => {
+    // Keep slide indices aligned with `sources`: a failed image borrows
+    // the first good one instead of shifting every later slide.
+    loaded.map((tex) => tex || ok[0]).forEach((tex) => {
       textures.push(tex);
       sizes.push(new THREE.Vector2(tex.image.naturalWidth || 1, tex.image.naturalHeight || 1));
     });
@@ -238,6 +304,7 @@ function createHeroGL(canvas, sources, hooks = {}) {
     // already faded out the CSS fallback behind it.
     render();
     ready = true;
+    playVideo(0);
     hooks.onReady?.();
     if (!reduced) tick();
   });
@@ -250,7 +317,8 @@ function createHeroGL(canvas, sources, hooks = {}) {
       cancelAnimationFrame(rafId);
       io.disconnect();
       window.removeEventListener("resize", resize);
-      textures.forEach((t) => t.dispose());
+      new Set(textures).forEach((t) => t.dispose());
+      videos.forEach((v) => { if (!v) return; v.el.pause(); v.el.removeAttribute("src"); v.tex?.dispose(); });
       renderer.dispose();
     },
   };
