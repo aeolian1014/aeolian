@@ -766,7 +766,7 @@ RS.contact = {
   email: "sulaymonruziboev75@gmail.com",
   phone: "+998 94 314 55 77",
   phoneHref: "+998943145577",
-  location: "Samarkand, Uzbekistan",
+  location: "Tashkent, Uzbekistan",
   socials: [
     { name: "Instagram", href: "https://www.instagram.com/aeolian.arts/",     icon: "Media/Icons/instagram-png.png" },
     { name: "Behance",   href: "https://www.behance.net/sulaymoruziboe",     icon: "Media/Icons/behance-svg-wht.svg" },
