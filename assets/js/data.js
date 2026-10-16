@@ -30,6 +30,93 @@ RS.categories = [
    Card widths are NOT set here — main.js packs each grid row to exactly
    12 columns, so the mosaic stays flush at any item count or filter. */
 RS.works = [
+  /* October 16 2026 additions — new promos and client ads. */
+  {
+    "id": "premiere-target",
+    "ar": 0.5625,
+    "title": "Premiere Target — Client Ad",
+    "client": "Premiere Target",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-16",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/premiere-target.mp4",
+    "poster": "Media/web/animations/optimized/premiere-target-poster.jpg",
+    "blurb": "Talking-head ad for Premiere Target — punchy Uzbek captions, app UI inserts and sound design cut to the speaker."
+  },
+  {
+    "id": "mervan-makina-promo",
+    "ar": 0.5625,
+    "title": "Mervan Makina — Cleaning Machines",
+    "client": "Mervan Makina",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-16",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/mervan-makina-promo.mp4",
+    "poster": "Media/web/animations/optimized/mervan-makina-promo-poster.jpg",
+    "blurb": "Reel for an industrial cleaning-machine dealer — from mop to machine, a model lineup and warranty facts in motion type."
+  },
+  {
+    "id": "niagara-residence-promo",
+    "ar": 0.5625,
+    "title": "Niagara Residence",
+    "client": "Niagara Residence",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-16",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/niagara-residence-promo.mp4",
+    "poster": "Media/web/animations/optimized/niagara-residence-promo-poster.jpg",
+    "blurb": "Real-estate reel — a presenter, aerial reveal of the residence, location map and handover date in clean motion type."
+  },
+  {
+    "id": "euro-clean-promo",
+    "ar": 0.5625,
+    "title": "Euro Clean",
+    "client": "Euro Clean",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-16",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/euro-clean-promo.mp4",
+    "poster": "Media/web/animations/optimized/euro-clean-promo-poster.jpg",
+    "blurb": "Instagram reel for a carpet and sofa cleaning service — hypoallergenic cleaning, free pickup and bold Uzbek captions in the client's own style."
+  },
+  {
+    "id": "byd-song-plus-promo",
+    "ar": 1.7778,
+    "title": "BYD Song Plus — Promo",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-16",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/byd-song-plus-promo.mp4",
+    "poster": "Media/web/animations/optimized/byd-song-plus-promo-poster.jpg",
+    "posterAt": 5,
+    "blurb": "Automotive promo for the BYD Song Plus — city and mountain drive shots and a close look at the cabin tech."
+  },
+  {
+    "id": "pepsi-promo",
+    "ar": 1.7778,
+    "title": "Pepsi — Promo",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-16",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/pepsi-promo.mp4",
+    "poster": "Media/web/animations/optimized/pepsi-promo-poster.jpg",
+    "posterAt": 4,
+    "blurb": "Drink promo for Pepsi — the can front and centre, ice, pour and fizz cut to an upbeat track."
+  },
   /* October 10 2026 additions — 16:9 promos; these lead the home hero. */
   {
     "id": "revuelto-sv-phonk-edit",
