@@ -30,6 +30,35 @@ RS.categories = [
    Card widths are NOT set here — main.js packs each grid row to exactly
    12 columns, so the mosaic stays flush at any item count or filter. */
 RS.works = [
+  /* October 17 2026 additions. */
+  {
+    "id": "mistral-motion-promo",
+    "ar": 0.5625,
+    "title": "Mistral Motion — Promo",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-17",
+    "tools": ["Remotion"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/mistral-motion-promo.mp4",
+    "poster": "Media/web/animations/optimized/mistral-motion-promo-poster.jpg",
+    "blurb": "Short promo for my own motion-graphics style — kinetic type, rhythm cuts and sound design in one vertical reel."
+  },
+  {
+    "id": "bmw-m4-trademark-district",
+    "ar": 0.5625,
+    "title": "BMW M4 — Trademark District Style",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-17",
+    "tools": ["Remotion", "AI Video"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/bmw-m4-trademark-district.mp4",
+    "poster": "Media/web/animations/optimized/bmw-m4-trademark-district-poster.jpg",
+    "blurb": "Car edit in the Trademark District look — HUD overlays, glitch cuts and spec stacks over AI-generated M4 shots."
+  },
   /* October 16 2026 additions — new promos and client ads. */
   {
     "id": "premiere-target",
