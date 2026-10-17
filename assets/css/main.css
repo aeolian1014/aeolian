@@ -344,8 +344,8 @@ input, textarea, select { font: inherit; color: inherit; }
 .nav__link.is-active { color: var(--ink); }
 .nav__link.is-active::after { right: 0; }
 
-@media (max-width: 900px) { .nav__links { display: none; } }
 .nav__links { display: flex; gap: 1.75rem; align-items: center; }
+@media (max-width: 900px) { .nav__links { display: none; } }
 
 /* Burger */
 .burger {
@@ -1430,6 +1430,7 @@ body.menu-open .menu__link {
 @media (max-width: 560px) {
   .card__meta { max-height: 3em; opacity: 1; margin-top: 0.25rem; }
   .nav__right { gap: 0.9rem; }
+  .nav__right .btn { padding: 0.75rem 1.1rem; white-space: nowrap; letter-spacing: 0.12em; }
   .burger__text { display: none; }
   .filters { gap: 0.4rem; }
   .filter { padding: 0.5rem 0.85rem; font-size: 0.75rem; }
