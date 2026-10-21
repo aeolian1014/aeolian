@@ -1067,12 +1067,13 @@ body.menu-open .menu__link {
   display: grid; place-items: center;
   padding: clamp(1rem, 3vw, 2.5rem) var(--gutter);
   min-height: 0;
+  grid-template-rows: minmax(0, 1fr); overflow: hidden;
 }
 .lb__frame {
   position: relative;
   max-width: min(1200px, 100%);
-  max-height: 100%;
-  display: grid; place-items: center;
+  height: 100%; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
 }
 /* The image is ALWAYS visible. It used to start at opacity 0 and wait for
    an `is-ready` class added on load — if that reveal failed for any reason
@@ -1082,7 +1083,7 @@ body.menu-open .menu__link {
    only ever fail open-with-nothing-showing. */
 .lb__frame img, .lb__frame video {
   max-width: 100%;
-  max-height: calc(100svh - 260px);
+  max-height: 100%; /* fit the stage, however tall the caption below is */
   width: auto; object-fit: contain;
   box-shadow: 0 40px 120px rgba(0, 0, 0, 0.7);
   opacity: 1;
@@ -1120,7 +1121,6 @@ body.menu-open .menu__link {
 @media (max-width: 860px) {
   .lb__info { grid-template-columns: 1fr; }
   .lb__tools { justify-content: flex-start; }
-  .lb__frame img, .lb__frame video { max-height: calc(100svh - 340px); }
 }
 
 /* ========================= 15. PAGE HERO ========================= */
