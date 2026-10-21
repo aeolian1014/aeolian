@@ -32,6 +32,20 @@ RS.categories = [
 RS.works = [
   /* October 21 2026 additions — Mistral Motion style tests. */
   {
+    "id": "porsche-mission-s",
+    "ar": 0.5625,
+    "title": "Porsche Mission S — Aura Edit",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-21",
+    "tools": ["Google Flow", "Remotion"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/porsche-mission-s.mp4",
+    "poster": "Media/web/animations/optimized/porsche-mission-s-poster.jpg",
+    "blurb": "Dark aura car film — every shot is a light waking up, slow push-ins and soft one-frame cuts on the beat, ending on the Mission S badge."
+  },
+  {
     "id": "mm-presentation-card",
     "ar": 0.5625,
     "title": "Mistral Motion — Presentation Card",
