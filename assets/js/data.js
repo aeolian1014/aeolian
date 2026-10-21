@@ -30,6 +30,49 @@ RS.categories = [
    Card widths are NOT set here — main.js packs each grid row to exactly
    12 columns, so the mosaic stays flush at any item count or filter. */
 RS.works = [
+  /* October 21 2026 additions — Mistral Motion style tests. */
+  {
+    "id": "mm-presentation-card",
+    "ar": 0.5625,
+    "title": "Mistral Motion — Presentation Card",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-21",
+    "tools": ["Remotion"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/mm-presentation-card.mp4",
+    "poster": "Media/web/animations/optimized/mm-presentation-card-poster.jpg",
+    "blurb": "A calm keynote told inside one white card — chapter tabs, karaoke type, live phone demos and soft sound design, with an Uzbek voice-over."
+  },
+  {
+    "id": "mm-keynote-glide",
+    "ar": 0.5625,
+    "title": "Mistral Motion — Keynote Glide",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-21",
+    "tools": ["Remotion"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/mm-keynote-glide.mp4",
+    "poster": "Media/web/animations/optimized/mm-keynote-glide-poster.jpg",
+    "blurb": "Apple-keynote pace on a pastel sky — gliding camera, blur-in words, laptop and UI demos, a 3D MM title and soft dissolves."
+  },
+  {
+    "id": "mm-pixel-director",
+    "ar": 0.5625,
+    "title": "Mistral Motion — Pixel Director",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-10-21",
+    "tools": ["Remotion"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/mm-pixel-director.mp4",
+    "poster": "Media/web/animations/optimized/mm-pixel-director-poster.jpg",
+    "blurb": "A pixel-art director and his mascot act out the voice-over — word-by-word kinetic type, pixel transitions and a neon grid stage."
+  },
   /* October 17 2026 additions. */
   {
     "id": "mistral-motion-promo",
