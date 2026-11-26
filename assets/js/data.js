@@ -30,7 +30,94 @@ RS.categories = [
    Card widths are NOT set here — main.js packs each grid row to exactly
    12 columns, so the mosaic stays flush at any item count or filter. */
 RS.works = [
-  /* October 21 2026 additions — Mistral Motion style tests. */
+  /* November 25 2026 featured additions. */
+  {
+    "id": "revuelto-sv-phonk-edit",
+    "ar": 1.7778,
+    "title": "Lamborghini Revuelto SV — Phonk Edit",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-11-25",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/revuelto-sv-phonk-edit.mp4",
+    "poster": "Media/web/animations/optimized/revuelto-sv-phonk-edit-poster.jpg",
+    "posterAt": 1,
+    "blurb": "Automotive edit cut to a phonk track — hard cuts on the beat, low angles and a studio-lit hero car."
+  },
+  {
+    "id": "monster-energy-full-throttle",
+    "ar": 1.7778,
+    "title": "Monster Energy — Full Throttle",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-11-25",
+    "tools": ["After Effects"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/monster-energy-full-throttle.mp4",
+    "poster": "Media/web/animations/optimized/monster-energy-full-throttle-poster.jpg",
+    "posterAt": 3,
+    "blurb": "Promo spot for Monster Energy: a hero can wrapped in green smoke, then drift footage and punchy kinetic type."
+  },
+  {
+    "id": "asus-rog-strix",
+    "ar": 0.5625,
+    "title": "Asus ROG Strix",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-11-25",
+    "tools": [],
+    "type": "video",
+    "src": "Media/web/animations/optimized/asus-rog-strix.mp4",
+    "poster": "Media/web/animations/optimized/asus-rog-strix-poster.jpg",
+    "blurb": "Asus ROG Strix motion design."
+  },
+  {
+    "id": "bmw-m4-trademark-district",
+    "ar": 0.5625,
+    "title": "BMW M4 — Trademark District Style",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-11-25",
+    "tools": ["Remotion", "AI Video"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/bmw-m4-trademark-district.mp4",
+    "poster": "Media/web/animations/optimized/bmw-m4-trademark-district-poster.jpg",
+    "blurb": "Car edit in the Trademark District look — HUD overlays, glitch cuts and spec stacks over AI-generated M4 shots."
+  },
+  {
+    "id": "revuelto-2",
+    "ar": 1.7777777777777777,
+    "title": "Revuelto 2",
+    "client": "Portfolio work",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-11-25",
+    "tools": [],
+    "type": "video",
+    "src": "Media/web/animations/optimized/revuelto-2.mp4",
+    "poster": "Media/web/animations/optimized/revuelto-2-poster.jpg",
+    "blurb": "Revuelto 2 motion design."
+  },
+  /* November 20 2026 additions. */
+  {
+    "id": "koenigsegg-jesko",
+    "ar": 0.5625,
+    "title": "Koenigsegg Jesko — Flow Edit",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-11-20",
+    "tools": ["Google Flow", "Remotion"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/koenigsegg-jesko.mp4",
+    "poster": "Media/web/animations/optimized/koenigsegg-jesko-poster.jpg",
+    "blurb": "Hypercar rhythm edit cut to the beat of SOL VIBRA — garage flickers, mountain glides, exhaust flames, and drop-synced cuts."
+  },
   {
     "id": "porsche-mission-s",
     "ar": 0.5625,
@@ -38,13 +125,28 @@ RS.works = [
     "client": "Personal",
     "cat": "animations",
     "year": "2026",
-    "addedAt": "2026-10-21",
+    "addedAt": "2026-11-20",
     "tools": ["Google Flow", "Remotion"],
     "type": "video",
     "src": "Media/web/animations/optimized/porsche-mission-s.mp4",
     "poster": "Media/web/animations/optimized/porsche-mission-s-poster.jpg",
     "blurb": "Dark aura car film — every shot is a light waking up, slow push-ins and soft one-frame cuts on the beat, ending on the Mission S badge."
   },
+  {
+    "id": "mistral-motion-promo",
+    "ar": 0.5625,
+    "title": "Mistral Motion — Skill Promo",
+    "client": "Personal",
+    "cat": "animations",
+    "year": "2026",
+    "addedAt": "2026-11-20",
+    "tools": ["Google Flow", "Remotion"],
+    "type": "video",
+    "src": "Media/web/animations/optimized/mistral-motion-promo.mp4",
+    "poster": "Media/web/animations/optimized/mistral-motion-promo-poster.jpg",
+    "blurb": "God Mode 2 promo for the Mistral Motion skill — kinetic type, 3D Flow hero shots, rhythm cuts, and Uzbek voice-over."
+  },
+  /* October 21 2026 additions — Mistral Motion style tests. */
   {
     "id": "mm-presentation-card",
     "ar": 0.5625,
@@ -86,35 +188,6 @@ RS.works = [
     "src": "Media/web/animations/optimized/mm-pixel-director.mp4",
     "poster": "Media/web/animations/optimized/mm-pixel-director-poster.jpg",
     "blurb": "A pixel-art director and his mascot act out the voice-over — word-by-word kinetic type, pixel transitions and a neon grid stage."
-  },
-  /* October 17 2026 additions. */
-  {
-    "id": "mistral-motion-promo",
-    "ar": 0.5625,
-    "title": "Mistral Motion — Promo",
-    "client": "Personal",
-    "cat": "animations",
-    "year": "2026",
-    "addedAt": "2026-10-17",
-    "tools": ["Remotion"],
-    "type": "video",
-    "src": "Media/web/animations/optimized/mistral-motion-promo.mp4",
-    "poster": "Media/web/animations/optimized/mistral-motion-promo-poster.jpg",
-    "blurb": "Short promo for my own motion-graphics style — kinetic type, rhythm cuts and sound design in one vertical reel."
-  },
-  {
-    "id": "bmw-m4-trademark-district",
-    "ar": 0.5625,
-    "title": "BMW M4 — Trademark District Style",
-    "client": "Personal",
-    "cat": "animations",
-    "year": "2026",
-    "addedAt": "2026-10-17",
-    "tools": ["Remotion", "AI Video"],
-    "type": "video",
-    "src": "Media/web/animations/optimized/bmw-m4-trademark-district.mp4",
-    "poster": "Media/web/animations/optimized/bmw-m4-trademark-district-poster.jpg",
-    "blurb": "Car edit in the Trademark District look — HUD overlays, glitch cuts and spec stacks over AI-generated M4 shots."
   },
   /* October 16 2026 additions — new promos and client ads. */
   {
@@ -205,36 +278,6 @@ RS.works = [
   },
   /* October 10 2026 additions — 16:9 promos; these lead the home hero. */
   {
-    "id": "revuelto-sv-phonk-edit",
-    "ar": 1.7778,
-    "title": "Lamborghini Revuelto SV — Phonk Edit",
-    "client": "Portfolio work",
-    "cat": "animations",
-    "year": "2026",
-    "addedAt": "2026-10-10",
-    "tools": ["After Effects"],
-    "type": "video",
-    "src": "Media/web/animations/optimized/revuelto-sv-phonk-edit.mp4",
-    "poster": "Media/web/animations/optimized/revuelto-sv-phonk-edit-poster.jpg",
-    "posterAt": 1,
-    "blurb": "Automotive edit cut to a phonk track — hard cuts on the beat, low angles and a studio-lit hero car."
-  },
-  {
-    "id": "monster-energy-full-throttle",
-    "ar": 1.7778,
-    "title": "Monster Energy — Full Throttle",
-    "client": "Portfolio work",
-    "cat": "animations",
-    "year": "2026",
-    "addedAt": "2026-10-10",
-    "tools": ["After Effects"],
-    "type": "video",
-    "src": "Media/web/animations/optimized/monster-energy-full-throttle.mp4",
-    "poster": "Media/web/animations/optimized/monster-energy-full-throttle-poster.jpg",
-    "posterAt": 3,
-    "blurb": "Promo spot for Monster Energy: a hero can wrapped in green smoke, then drift footage and punchy kinetic type."
-  },
-  {
     "id": "click-superapp-promo",
     "ar": 1.7778,
     "title": "Click SuperApp Promo",
@@ -280,20 +323,6 @@ RS.works = [
     "blurb": "Explainer promo for the My Shartnoma contracts app — a relatable office story told with clean motion type."
   },
   /* October 2026 additions — lightweight web copies; originals preserved. */
-  {
-    "id": "asus-rog-strix",
-    "ar": 0.5625,
-    "title": "Asus ROG Strix",
-    "client": "Portfolio work",
-    "cat": "animations",
-    "year": "2026",
-    "addedAt": "2026-10-01",
-    "tools": [],
-    "type": "video",
-    "src": "Media/web/animations/optimized/asus-rog-strix.mp4",
-    "poster": "Media/web/animations/optimized/asus-rog-strix-poster.jpg",
-    "blurb": "Asus ROG Strix motion design."
-  },
   {
     "id": "binance",
     "ar": 0.5625,
@@ -405,20 +434,6 @@ RS.works = [
     "src": "Media/web/animations/optimized/revuelto-1.mp4",
     "poster": "Media/web/animations/optimized/revuelto-1-poster.jpg",
     "blurb": "Revuelto 1 motion design."
-  },
-  {
-    "id": "revuelto-2",
-    "ar": 1.7777777777777777,
-    "title": "Revuelto 2",
-    "client": "Portfolio work",
-    "cat": "animations",
-    "year": "2026",
-    "addedAt": "2026-10-01",
-    "tools": [],
-    "type": "video",
-    "src": "Media/web/animations/optimized/revuelto-2.mp4",
-    "poster": "Media/web/animations/optimized/revuelto-2-poster.jpg",
-    "blurb": "Revuelto 2 motion design."
   },
   {
     "id": "spotify-v2",
